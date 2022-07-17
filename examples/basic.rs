@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 // TODO: Figure out why importing the prelude doesn't work here
 use bevy_asset_loader::*;
-use bevy_prototype_fluent::LocalizationSource;
+use bevy_prototype_fluent::{LocalizationPlugin, LocalizationSource};
 use fluent::{FluentBundle, FluentResource};
 use unic_langid::langid;
 
@@ -14,8 +14,9 @@ struct ExampleLocalization {
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(LocalizationPlugin)
         .init_collection::<ExampleLocalization>()
-        .add_startup_system(print_text)
+        .add_system(print_text)
         .run();
 }
 
@@ -32,9 +33,7 @@ fn print_text(handle: Res<ExampleLocalization>, localizations: Res<Assets<Locali
             .add_resource(res)
             .expect("Failed to add FTL resources to the bundle.");
 
-        let msg = bundle
-            .get_message("hello-world")
-            .expect("Message doesn't exist.");
+        let msg = bundle.get_message("hello").expect("Message doesn't exist.");
 
         // TODO: Make this suck less
         let mut errors = vec![];

@@ -1,7 +1,8 @@
 use fluent::FluentBundle;
 
-use bevy::reflect::TypeUuid;
+use bevy::{prelude::*, reflect::TypeUuid};
 use fluent::FluentResource;
+use loaders::ftl_loader::FtlLoader;
 
 mod loaders;
 
@@ -21,11 +22,25 @@ pub trait LocalizationBundle<R> {
     fn bundle(&self) -> FluentBundle<R>;
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
+/// Idk what I'm doing
+pub struct LocalizationOutput;
+
+impl FromWorld for LocalizationOutput {
+    fn from_world(_world: &mut World) -> Self {
+        // ???
+        Self
+    }
+}
+
+#[derive(Default)]
+pub struct LocalizationPlugin;
+
+impl Plugin for LocalizationPlugin {
+    fn build(&self, app: &mut App) {
+        // What does this do??
+        app.init_non_send_resource::<LocalizationOutput>()
+            .add_asset::<LocalizationSource>();
+
+        app.init_asset_loader::<FtlLoader>();
     }
 }
