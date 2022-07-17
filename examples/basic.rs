@@ -8,7 +8,7 @@ use unic_langid::{langid, LanguageIdentifier};
 
 #[derive(AssetCollection)]
 struct ExampleLocalization {
-    #[asset(path = "basic/en_us.ftl")]
+    #[asset(path = "strings/basic/en_us.ftl")]
     en_us: Handle<LocalizationSource>,
 }
 
