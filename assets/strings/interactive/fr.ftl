@@ -1,1 +1,1 @@
-hello = Bonjour, le monde!
+hello = Salut, Bevy!
