@@ -15,6 +15,10 @@ impl CurrentLocale {
     pub fn new(language_id: LanguageIdentifier) -> Self {
         CurrentLocale(language_id)
     }
+
+    pub fn update(&mut self, language_id: LanguageIdentifier) {
+        self.0 = language_id;
+    }
 }
 
 #[derive(Debug, TypeUuid)]
