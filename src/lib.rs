@@ -1,3 +1,5 @@
+mod loaders;
+
 #[cfg(test)]
 mod tests {
     #[test]
