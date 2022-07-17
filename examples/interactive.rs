@@ -10,6 +10,12 @@ use unic_langid::{langid, LanguageIdentifier};
 struct ExampleLocalization {
     #[asset(path = "strings/interactive/en_us.ftl")]
     en_us: Handle<LocalizationSource>,
+
+    #[asset(path = "strings/interactive/de.ftl")]
+    de: Handle<LocalizationSource>,
+
+    #[asset(path = "strings/interactive/fr.ftl")]
+    fr: Handle<LocalizationSource>,
 }
 
 // TODO: This should be implemented with a fancy derive macro instead
@@ -18,10 +24,11 @@ impl LocalizationBundle for ExampleLocalization {
         &self,
         language_id: &LanguageIdentifier,
     ) -> Result<Handle<LocalizationSource>, LocalizationError> {
-        if *language_id == langid!("en-US") {
-            Ok(self.en_us.clone())
-        } else {
-            Err(LocalizationError)
+        match *language_id {
+            langid!("en-US") => Ok(self.en_us.clone()),
+            langid!("de") => Ok(self.de.clone()),
+            langid!("fr") => Ok(self.fr.clone()),
+            _ => Err(LocalizationError),
         }
     }
 }
