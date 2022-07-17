@@ -8,5 +8,14 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.58"
 bevy = { version = "0.7.0", default-features = false }
+bevy_asset_loader = "0.11.0"
 fluent = "0.16.0"
 unic-langid = { version = "0.9.0", features = ["macros"] }
+
+[dev-dependencies]
+# TODO: Only use features that we need in the examples
+bevy = "0.7.0"
+
+[[example]]
+name = "basic"
+path = "examples/basic.rs"

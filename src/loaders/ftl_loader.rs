@@ -2,7 +2,7 @@ use anyhow::Result;
 use bevy::asset::{AssetLoader, LoadedAsset};
 use fluent::FluentResource;
 
-use super::FluentSource;
+use crate::LocalizationSource;
 
 #[derive(Default)]
 pub struct FtlLoader;
@@ -19,7 +19,7 @@ impl AssetLoader for FtlLoader {
             let resource =
                 FluentResource::try_new(ftl_string).expect("Failed to parse an FTL string.");
 
-            load_context.set_default_asset(LoadedAsset::new(FluentSource::new(resource)));
+            load_context.set_default_asset(LoadedAsset::new(LocalizationSource::new(resource)));
 
             Ok(())
         })
