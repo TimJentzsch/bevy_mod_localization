@@ -2,13 +2,9 @@ use bevy::prelude::*;
 // TODO: Figure out why importing the prelude doesn't work here
 use bevy_asset_loader::*;
 use bevy_prototype_fluent::{
-    LocalizationBundle, LocalizationError, LocalizationPlugin, LocalizationSource,
+    CurrentLocale, LocalizationBundle, LocalizationError, LocalizationPlugin, LocalizationSource,
 };
-use fluent::{FluentBundle, FluentResource};
 use unic_langid::{langid, LanguageIdentifier};
-
-/// The currently active locale
-struct CurrentLocale(LanguageIdentifier);
 
 #[derive(AssetCollection)]
 struct ExampleLocalization {
@@ -34,7 +30,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(LocalizationPlugin)
-        .insert_resource(CurrentLocale(langid!("en-US")))
+        .insert_resource(CurrentLocale::new(langid!("en-US")))
         .init_collection::<ExampleLocalization>()
         .add_system(print_text)
         .run();
@@ -45,7 +41,7 @@ fn print_text(
     handle: Res<ExampleLocalization>,
     assets: Res<Assets<LocalizationSource>>,
 ) {
-    if let Ok(msg) = handle.try_get_message(&current_locale.0, assets, "hello") {
+    if let Ok(msg) = handle.try_get_message(&current_locale, assets, "hello") {
         println!("{msg}");
     }
 }

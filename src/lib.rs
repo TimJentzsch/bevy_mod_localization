@@ -7,6 +7,16 @@ use unic_langid::LanguageIdentifier;
 
 mod loaders;
 
+#[derive(PartialEq, Eq, Debug, Clone)]
+/// The currently active locale
+pub struct CurrentLocale(LanguageIdentifier);
+
+impl CurrentLocale {
+    pub fn new(language_id: LanguageIdentifier) -> Self {
+        CurrentLocale(language_id)
+    }
+}
+
 #[derive(Debug, TypeUuid)]
 #[uuid = "c807fa98-31ad-4d85-8988-ab4313cced3f"]
 pub struct LocalizationSource {
@@ -33,10 +43,11 @@ pub trait LocalizationBundle {
 
     fn try_get_message(
         &self,
-        language_id: &LanguageIdentifier,
+        current_locale: &CurrentLocale,
         assets: Res<Assets<LocalizationSource>>,
         message_id: &str,
     ) -> Result<String, LocalizationError> {
+        let language_id = &current_locale.0;
         let handle = self.try_get_resource_handle(language_id)?;
 
         // Build resource
