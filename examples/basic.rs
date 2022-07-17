@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 // TODO: Figure out why importing the prelude doesn't work here
 use bevy_asset_loader::*;
-use bevy_prototype_fluent::{LocalizationPlugin, LocalizationSource};
+use bevy_prototype_fluent::{
+    LocalizationBundle, LocalizationError, LocalizationPlugin, LocalizationSource,
+};
 use fluent::{FluentBundle, FluentResource};
 use unic_langid::{langid, LanguageIdentifier};
 
@@ -12,6 +14,20 @@ struct CurrentLocale(LanguageIdentifier);
 struct ExampleLocalization {
     #[asset(path = "basic/en_us.ftl")]
     en_us: Handle<LocalizationSource>,
+}
+
+// TODO: This should be implemented with a fancy derive macro instead
+impl LocalizationBundle for ExampleLocalization {
+    fn try_get_resource_handle(
+        &self,
+        language_id: &LanguageIdentifier,
+    ) -> Result<Handle<LocalizationSource>, LocalizationError> {
+        if *language_id == langid!("en-US") {
+            Ok(self.en_us.clone())
+        } else {
+            Err(LocalizationError)
+        }
+    }
 }
 
 fn main() {
@@ -27,28 +43,9 @@ fn main() {
 fn print_text(
     current_locale: Res<CurrentLocale>,
     handle: Res<ExampleLocalization>,
-    localizations: Res<Assets<LocalizationSource>>,
+    assets: Res<Assets<LocalizationSource>>,
 ) {
-    // TODO: Make this based on the current locale
-    if let Some(source) = localizations.get(&handle.en_us) {
-        let res: &FluentResource = &source.resource;
-
-        // TODO: The bundle should be created automatically
-        let mut bundle = FluentBundle::new(vec![current_locale.0.clone()]);
-        bundle
-            .add_resource(res)
-            .expect("Failed to add FTL resources to the bundle.");
-
-        let msg = bundle.get_message("hello").expect("Message doesn't exist.");
-
-        // TODO: Make this suck less
-        let mut errors = vec![];
-        let pattern = msg.value().expect("Message has no value.");
-        let value = bundle.format_pattern(&pattern, None, &mut errors);
-
-        // Print the localized text!
-        println!("{}", value);
-    } else {
-        println!("Localization not loaded yet!");
+    if let Ok(msg) = handle.try_get_message(&current_locale.0, assets, "hello") {
+        println!("{msg}");
     }
 }
