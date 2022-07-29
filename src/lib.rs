@@ -6,6 +6,7 @@ use unic_langid::LanguageIdentifier;
 mod fluent;
 mod loaders;
 pub mod localization;
+pub mod plugin;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 /// The currently active locale
@@ -44,18 +45,5 @@ impl FromWorld for LocalizationOutput {
     fn from_world(_world: &mut World) -> Self {
         // ???
         Self
-    }
-}
-
-#[derive(Default)]
-pub struct LocalizationPlugin {}
-
-impl Plugin for LocalizationPlugin {
-    fn build(&self, app: &mut App) {
-        // What does this do??
-        app.init_non_send_resource::<LocalizationOutput>()
-            .add_asset::<LocalizationSource>();
-
-        app.init_asset_loader::<FtlLoader>();
     }
 }

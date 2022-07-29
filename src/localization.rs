@@ -64,6 +64,8 @@ impl AddLocalization for App {
 
         let localization = Localization::<T>::new();
 
+        let asset_server = self.world.resource::<AssetServer>();
+
         self.insert_resource(localization);
 
         self
