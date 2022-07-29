@@ -1,6 +1,6 @@
-use std::marker::PhantomData;
+use std::{marker::PhantomData, path::Path};
 
-use crate::fluent::FluentBundle;
+use crate::{fluent::FluentBundle, CurrentLocale, LocalizationSource};
 use bevy::prelude::*;
 
 use crate::LocalizationError;
@@ -12,13 +12,15 @@ pub trait LocalizationFolder: 'static + std::marker::Send + std::marker::Sync {
 
 pub struct Localization<T: LocalizationFolder> {
     phantom: std::marker::PhantomData<T>,
+    handle: Handle<LocalizationSource>,
     cur_bundle: Option<FluentBundle>,
 }
 
 impl<T: LocalizationFolder> Localization<T> {
-    pub fn new() -> Self {
+    pub fn new(handle: Handle<LocalizationSource>) -> Self {
         Self {
             phantom: PhantomData,
+            handle,
             cur_bundle: None,
         }
     }
@@ -46,12 +48,6 @@ impl<T: LocalizationFolder> Localization<T> {
     }
 }
 
-impl<T: LocalizationFolder> Default for Localization<T> {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub trait AddLocalization {
     fn add_localization<T: LocalizationFolder>(&mut self) -> &mut Self;
 }
@@ -62,9 +58,13 @@ impl AddLocalization for App {
             return self;
         }
 
-        let localization = Localization::<T>::new();
-
+        let locale = self.world.resource::<CurrentLocale>();
         let asset_server = self.world.resource::<AssetServer>();
+
+        let ftl_path = Path::new(&T::folder_path()).join(format!("{}.ftl", locale.0.to_string()));
+        let handle: Handle<LocalizationSource> = asset_server.load(ftl_path);
+
+        let localization = Localization::<T>::new(handle);
 
         self.insert_resource(localization);
 
