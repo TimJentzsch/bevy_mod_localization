@@ -2,46 +2,33 @@ use bevy::prelude::*;
 // TODO: Figure out why importing the prelude doesn't work here
 use bevy_asset_loader::*;
 use bevy_prototype_fluent::{
-    CurrentLocale, LocalizationBundle, LocalizationError, LocalizationPlugin, LocalizationSource,
+    localization, CurrentLocale, LocalizationBundle, LocalizationError, LocalizationPlugin,
+    LocalizationSource,
 };
 use unic_langid::{langid, LanguageIdentifier};
 
-#[derive(AssetCollection)]
-struct ExampleLocalization {
-    #[asset(path = "strings/basic/en_us.ftl")]
-    en_us: Handle<LocalizationSource>,
-}
-
-// TODO: This should be implemented with a fancy derive macro instead
-impl LocalizationBundle for ExampleLocalization {
-    fn try_get_resource_handle(
-        &self,
-        language_id: &LanguageIdentifier,
-    ) -> Result<Handle<LocalizationSource>, LocalizationError> {
-        if *language_id == langid!("en-US") {
-            Ok(self.en_us.clone())
-        } else {
-            Err(LocalizationError)
-        }
-    }
-}
+#[derive(LocalizationFolder)]
+#[localization(folder = "locale")]
+struct ExampleLocalization;
 
 fn main() {
     App::new()
+        .insert_resource(Locale(EN::US))
         .add_plugins(DefaultPlugins)
         .add_plugin(LocalizationPlugin)
-        .insert_resource(CurrentLocale::new(langid!("en-US")))
-        .init_collection::<ExampleLocalization>()
-        .add_system(print_text)
+        .add_localization::<ExampleLocalization>()
+        .add_system(use_localization_system)
+        // -- snip --
         .run();
 }
 
-fn print_text(
-    current_locale: Res<CurrentLocale>,
-    handle: Res<ExampleLocalization>,
-    assets: Res<Assets<LocalizationSource>>,
-) {
-    if let Ok(msg) = handle.try_get_message(&current_locale, assets, "hello") {
+fn use_localization_system(localization: Option<Res<Locale<ExampleLocalization>>>) {
+    if let Some(localization) = localization {
+        let msg = localization.try_get_message("hello").unwrap();
         println!("{msg}");
     }
+}
+
+fn change_locale_system(locale: ResMut<Locale>) {
+    locale.set(DE::DE);
 }
