@@ -1,6 +1,5 @@
 use crate::fluent::FluentResource;
 use bevy::{prelude::*, reflect::TypeUuid};
-use loaders::ftl_loader::FtlLoader;
 use unic_langid::LanguageIdentifier;
 
 mod fluent;
