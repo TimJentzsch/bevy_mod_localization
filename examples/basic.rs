@@ -1,47 +1,34 @@
-use bevy::prelude::*;
-// TODO: Figure out why importing the prelude doesn't work here
-use bevy_asset_loader::*;
+use bevy::{asset::AssetPlugin, prelude::*};
 use bevy_prototype_fluent::{
-    CurrentLocale, LocalizationBundle, LocalizationError, LocalizationPlugin, LocalizationSource,
+    localization::AddLocalization,
+    localization::{Localization, LocalizationFolder},
+    plugin::LocalizationPlugin,
+    CurrentLocale,
 };
-use unic_langid::{langid, LanguageIdentifier};
+use unic_langid::langid;
 
-#[derive(AssetCollection)]
-struct ExampleLocalization {
-    #[asset(path = "strings/basic/en_us.ftl")]
-    en_us: Handle<LocalizationSource>,
-}
+struct ExampleLocalization;
 
-// TODO: This should be implemented with a fancy derive macro instead
-impl LocalizationBundle for ExampleLocalization {
-    fn try_get_resource_handle(
-        &self,
-        language_id: &LanguageIdentifier,
-    ) -> Result<Handle<LocalizationSource>, LocalizationError> {
-        if *language_id == langid!("en-US") {
-            Ok(self.en_us.clone())
-        } else {
-            Err(LocalizationError)
-        }
+// TODO: Write a derive macro for this
+impl LocalizationFolder for ExampleLocalization {
+    fn folder_path() -> String {
+        "strings/basic".to_string()
     }
 }
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugin(LocalizationPlugin)
         .insert_resource(CurrentLocale::new(langid!("en-US")))
-        .init_collection::<ExampleLocalization>()
-        .add_system(print_text)
+        .add_plugins(MinimalPlugins)
+        .add_plugin(AssetPlugin)
+        .add_plugin(LocalizationPlugin)
+        .add_localization::<ExampleLocalization>()
+        .add_system(use_localization_system)
         .run();
 }
 
-fn print_text(
-    current_locale: Res<CurrentLocale>,
-    handle: Res<ExampleLocalization>,
-    assets: Res<Assets<LocalizationSource>>,
-) {
-    if let Ok(msg) = handle.try_get_message(&current_locale, assets, "hello") {
+fn use_localization_system(localization: Res<Localization<ExampleLocalization>>) {
+    if let Ok(msg) = localization.try_get_message("hello") {
         println!("{msg}");
     }
 }
