@@ -1,6 +1,6 @@
 use std::{marker::PhantomData, path::Path};
 
-use crate::{fluent::FluentBundle, CurrentLocale, LocalizationSource};
+use crate::{fluent::FluentBundle, plugin::LocalizationStage, CurrentLocale, LocalizationSource};
 use bevy::prelude::*;
 use fluent::FluentResource;
 
@@ -67,7 +67,10 @@ impl AddLocalization for App {
 
         let localization = Localization::<T>::new(handle);
 
-        self.insert_resource(localization);
+        self.insert_resource(localization).add_system_to_stage(
+            LocalizationStage::UpdateLocalization,
+            update_localization::<T>,
+        );
 
         self
     }
