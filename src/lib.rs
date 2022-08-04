@@ -1,4 +1,3 @@
-use crate::fluent::FluentResource;
 use bevy::{prelude::*, reflect::TypeUuid};
 use unic_langid::LanguageIdentifier;
 
@@ -7,8 +6,8 @@ mod loaders;
 pub mod localization;
 pub mod plugin;
 
-#[derive(PartialEq, Eq, Debug, Clone)]
 /// The currently active locale
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct CurrentLocale(LanguageIdentifier);
 
 impl CurrentLocale {
@@ -24,12 +23,12 @@ impl CurrentLocale {
 #[derive(Debug, TypeUuid)]
 #[uuid = "c807fa98-31ad-4d85-8988-ab4313cced3f"]
 pub struct LocalizationSource {
-    pub resource: FluentResource,
+    pub ftl_string: String,
 }
 
 impl LocalizationSource {
-    pub fn new(resource: FluentResource) -> Self {
-        Self { resource }
+    pub fn new(ftl_string: String) -> Self {
+        Self { ftl_string }
     }
 }
 

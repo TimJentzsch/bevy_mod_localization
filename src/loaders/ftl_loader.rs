@@ -1,6 +1,5 @@
 use anyhow::Result;
 use bevy::asset::{AssetLoader, LoadedAsset};
-use fluent::FluentResource;
 
 use crate::LocalizationSource;
 
@@ -16,10 +15,7 @@ impl AssetLoader for FtlLoader {
         Box::pin(async move {
             let ftl_string = String::from_utf8(Vec::from(bytes))?;
 
-            let resource =
-                FluentResource::try_new(ftl_string).expect("Failed to parse an FTL string.");
-
-            load_context.set_default_asset(LoadedAsset::new(LocalizationSource::new(resource)));
+            load_context.set_default_asset(LoadedAsset::new(LocalizationSource::new(ftl_string)));
 
             Ok(())
         })

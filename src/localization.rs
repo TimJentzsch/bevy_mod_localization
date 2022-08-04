@@ -2,6 +2,7 @@ use std::{marker::PhantomData, path::Path};
 
 use crate::{fluent::FluentBundle, CurrentLocale, LocalizationSource};
 use bevy::prelude::*;
+use fluent::FluentResource;
 
 use crate::LocalizationError;
 
@@ -69,5 +70,46 @@ impl AddLocalization for App {
         self.insert_resource(localization);
 
         self
+    }
+}
+
+fn update_localization<T: LocalizationFolder>(
+    mut localization: ResMut<Localization<T>>,
+    mut ev_asset: EventReader<AssetEvent<LocalizationSource>>,
+    assets: ResMut<Assets<LocalizationSource>>,
+    cur_locale: Res<CurrentLocale>,
+) {
+    for ev in ev_asset.iter() {
+        match ev {
+            AssetEvent::Created { handle } | AssetEvent::Modified { handle } => {
+                if *handle != localization.handle {
+                    continue;
+                }
+
+                let source = assets
+                    .get(handle)
+                    .expect("Localization source expected to be loaded but it wasn't!");
+
+                // TODO: Make this more efficient, the parsing could take some time
+                let resource = FluentResource::try_new(source.ftl_string.clone())
+                    .expect("Failed to parse an FTL string.");
+
+                let lang_id = cur_locale.0.clone();
+
+                let mut bundle = FluentBundle::new_concurrent(vec![lang_id]);
+                bundle
+                    .add_resource(resource)
+                    .expect("Failed to add resource to bundle");
+
+                localization.cur_bundle = Some(bundle);
+            }
+            AssetEvent::Removed { handle } => {
+                if *handle != localization.handle {
+                    continue;
+                }
+
+                localization.cur_bundle = None;
+            }
+        }
     }
 }
