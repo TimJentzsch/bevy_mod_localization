@@ -1,34 +1,34 @@
-use bevy::prelude::*;
-// TODO: Figure out why importing the prelude doesn't work here
-use bevy_asset_loader::*;
+use bevy::{asset::AssetPlugin, prelude::*};
 use bevy_prototype_fluent::{
-    localization, CurrentLocale, LocalizationBundle, LocalizationError, LocalizationPlugin,
-    LocalizationSource,
+    localization::AddLocalization,
+    localization::{Localization, LocalizationFolder},
+    plugin::LocalizationPlugin,
+    CurrentLocale,
 };
-use unic_langid::{langid, LanguageIdentifier};
+use unic_langid::langid;
 
-#[derive(LocalizationFolder)]
-#[localization(folder = "locale")]
 struct ExampleLocalization;
 
-fn main() {
-    App::new()
-        .insert_resource(Locale(EN::US))
-        .add_plugins(DefaultPlugins)
-        .add_plugin(LocalizationPlugin)
-        .add_localization::<ExampleLocalization>()
-        .add_system(use_localization_system)
-        // -- snip --
-        .run();
-}
-
-fn use_localization_system(localization: Option<Res<Locale<ExampleLocalization>>>) {
-    if let Some(localization) = localization {
-        let msg = localization.try_get_message("hello").unwrap();
-        println!("{msg}");
+// TODO: Write a derive macro for this
+impl LocalizationFolder for ExampleLocalization {
+    fn folder_path() -> String {
+        "strings/test".to_string()
     }
 }
 
-fn change_locale_system(locale: ResMut<Locale>) {
-    locale.set(DE::DE);
+fn main() {
+    App::new()
+        .insert_resource(CurrentLocale::new(langid!("en-US")))
+        .add_plugins(MinimalPlugins)
+        .add_plugin(AssetPlugin)
+        .add_plugin(LocalizationPlugin)
+        .add_localization::<ExampleLocalization>()
+        .add_system(use_localization_system)
+        .run();
+}
+
+fn use_localization_system(localization: Res<Localization<ExampleLocalization>>) {
+    if let Ok(msg) = localization.try_get_message("hello") {
+        println!("{msg}");
+    }
 }

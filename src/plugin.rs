@@ -9,7 +9,7 @@ pub enum LocalizationStage {
 }
 
 #[derive(Default)]
-pub struct LocalizationPlugin {}
+pub struct LocalizationPlugin;
 
 impl Plugin for LocalizationPlugin {
     fn build(&self, app: &mut App) {

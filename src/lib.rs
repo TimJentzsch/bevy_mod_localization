@@ -33,7 +33,7 @@ impl LocalizationSource {
 }
 
 // TODO: Make this a proper error
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Debug)]
 pub struct LocalizationError;
 
 /// Idk what I'm doing
