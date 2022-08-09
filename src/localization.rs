@@ -65,6 +65,10 @@ impl<T: LocalizationFolder> Localization<T> {
         args: FluentArgs,
     ) -> Result<String, LocalizationError> {
         self.try_format_pattern(message_id, Some(&args))
+            // The inserted values are wrapped in U+2058 (First Strong Isolate) and U+2069 (Pop Directional Isolate)
+            // The font can't handle them, so we replace them for now
+            // TODO: Don't do this
+            .map(|msg| msg.replace('\u{2068}', "").replace('\u{2069}', ""))
     }
 }
 
