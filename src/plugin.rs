@@ -5,7 +5,7 @@ use crate::{loaders::ftl_loader::FtlLoader, LocalizationOutput, LocalizationSour
 /// The names of localization stages in an App Schedule
 #[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
 pub enum LocalizationStage {
-    UpdateLocalization,
+    HandleChanges,
 }
 
 #[derive(Default)]
@@ -19,9 +19,10 @@ impl Plugin for LocalizationPlugin {
 
         app.init_asset_loader::<FtlLoader>();
 
+        // Stage to update localization after the file or locale has been loaded/changed
         app.add_stage_after(
             AssetStage::AssetEvents,
-            LocalizationStage::UpdateLocalization,
+            LocalizationStage::HandleChanges,
             SystemStage::parallel(),
         );
     }
