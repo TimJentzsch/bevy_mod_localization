@@ -10,15 +10,6 @@ use bevy_prototype_fluent::{
 };
 use unic_langid::langid;
 
-struct ExampleLocalization;
-
-// TODO: Write a derive macro for this
-impl LocalizationFolder for ExampleLocalization {
-    fn folder_path() -> String {
-        "strings/basic".to_string()
-    }
-}
-
 fn main() {
     App::new()
         // Optional: Enable hot reloading
@@ -32,13 +23,23 @@ fn main() {
         .add_plugin(AssetPlugin)
         .add_plugin(LocalizationPlugin)
         // Add the localization resource for the given folder
-        .add_localization::<ExampleLocalization>()
+        .add_localization::<BasicLocalizationFolder>()
         // Do something with it!
-        .add_system(use_localization_system)
+        .add_system(print_message_system)
         .run();
 }
 
-fn use_localization_system(localization: Res<Localization<ExampleLocalization>>) {
+struct BasicLocalizationFolder;
+
+// TODO: Write a derive macro for this
+impl LocalizationFolder for BasicLocalizationFolder {
+    fn folder_path() -> String {
+        "strings/basic".to_string()
+    }
+}
+
+/// Print the text from the localization file.
+fn print_message_system(localization: Res<Localization<BasicLocalizationFolder>>) {
     if let Ok(msg) = localization.try_get_message("hello") {
         println!("{msg}");
     }
