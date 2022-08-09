@@ -1,8 +1,9 @@
-use bevy::prelude::*;
-// TODO: Figure out why importing the prelude doesn't work here
-use bevy_asset_loader::*;
+use bevy::{asset::AssetServerSettings, prelude::*};
 use bevy_prototype_fluent::{
-    CurrentLocale, LocalizationBundle, LocalizationError, LocalizationPlugin, LocalizationSource,
+    localization::AddLocalization,
+    localization::{Localization, LocalizationFolder},
+    plugin::LocalizationPlugin,
+    CurrentLocale,
 };
 use unic_langid::{langid, LanguageIdentifier};
 
@@ -10,39 +11,27 @@ const EN_US: LanguageIdentifier = langid!("en-US");
 const DE: LanguageIdentifier = langid!("de");
 const FR: LanguageIdentifier = langid!("fr");
 
-#[derive(AssetCollection)]
-struct ExampleLocalization {
-    #[asset(path = "strings/interactive/en_us.ftl")]
-    en_us: Handle<LocalizationSource>,
+struct ExampleLocalization;
 
-    #[asset(path = "strings/interactive/de.ftl")]
-    de: Handle<LocalizationSource>,
-
-    #[asset(path = "strings/interactive/fr.ftl")]
-    fr: Handle<LocalizationSource>,
-}
-
-// TODO: This should be implemented with a fancy derive macro instead
-impl LocalizationBundle for ExampleLocalization {
-    fn try_get_resource_handle(
-        &self,
-        language_id: &LanguageIdentifier,
-    ) -> Result<Handle<LocalizationSource>, LocalizationError> {
-        match *language_id {
-            EN_US => Ok(self.en_us.clone()),
-            DE => Ok(self.de.clone()),
-            FR => Ok(self.fr.clone()),
-            _ => Err(LocalizationError),
-        }
+// TODO: Write a derive macro for this
+impl LocalizationFolder for ExampleLocalization {
+    fn folder_path() -> String {
+        "strings/interactive".to_string()
     }
 }
 
 fn main() {
     App::new()
+        // Optional: Enable hot reloading
+        .insert_resource(AssetServerSettings {
+            watch_for_changes: true,
+            ..default()
+        })
         .add_plugins(DefaultPlugins)
         .add_plugin(LocalizationPlugin)
         .insert_resource(CurrentLocale::new(EN_US))
-        .init_collection::<ExampleLocalization>()
+        // Add the localization resource for the given folder
+        .add_localization::<ExampleLocalization>()
         .add_startup_system(setup)
         .add_system(text_update_system)
         .add_system(button_system)
@@ -175,13 +164,11 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn text_update_system(
-    current_locale: Res<CurrentLocale>,
-    handle: Res<ExampleLocalization>,
-    assets: Res<Assets<LocalizationSource>>,
+    localization: Res<Localization<ExampleLocalization>>,
     mut query: Query<&mut Text, With<LocalizedText>>,
 ) {
     if let Ok(mut text) = query.get_single_mut() {
-        if let Ok(msg) = handle.try_get_message(&current_locale, assets, "hello") {
+        if let Ok(msg) = localization.try_get_message("hello") {
             // Update the text with the localization
             text.sections[0].value = msg;
         }
