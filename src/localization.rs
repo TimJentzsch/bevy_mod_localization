@@ -62,7 +62,7 @@ impl AddLocalization for App {
         let locale = self.world.resource::<CurrentLocale>();
         let asset_server = self.world.resource::<AssetServer>();
 
-        let ftl_path = Path::new(&T::folder_path()).join(format!("{}.ftl", locale.0.to_string()));
+        let ftl_path = Path::new(&T::folder_path()).join(format!("{}.ftl", locale.0));
         let handle: Handle<LocalizationSource> = asset_server.load(ftl_path);
 
         let localization = Localization::<T>::new(handle);
