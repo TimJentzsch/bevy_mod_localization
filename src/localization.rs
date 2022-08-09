@@ -5,7 +5,7 @@ use std::{
 
 use crate::{fluent::FluentBundle, plugin::LocalizationStage, CurrentLocale, LocalizationSource};
 use bevy::prelude::*;
-use fluent::FluentResource;
+use fluent::{FluentArgs, FluentResource};
 
 use crate::LocalizationError;
 
@@ -29,7 +29,11 @@ impl<T: LocalizationFolder> Localization<T> {
         }
     }
 
-    pub fn try_get_message(&self, message_id: &str) -> Result<String, LocalizationError> {
+    fn try_format_pattern(
+        &self,
+        message_id: &str,
+        args: Option<&FluentArgs>,
+    ) -> Result<String, LocalizationError> {
         let bundle = if let Some(bundle) = &self.cur_bundle {
             bundle
         } else {
@@ -42,13 +46,25 @@ impl<T: LocalizationFolder> Localization<T> {
 
         let mut errors = vec![];
         let pattern = msg.value().expect("Message has no value.");
-        let value = bundle.format_pattern(pattern, None, &mut errors);
+        let value = bundle.format_pattern(pattern, args, &mut errors);
 
         if !errors.is_empty() {
             Err(LocalizationError)
         } else {
             Ok(value.to_string())
         }
+    }
+
+    pub fn try_get_message(&self, message_id: &str) -> Result<String, LocalizationError> {
+        self.try_format_pattern(message_id, None)
+    }
+
+    pub fn try_format_message(
+        &self,
+        message_id: &str,
+        args: FluentArgs,
+    ) -> Result<String, LocalizationError> {
+        self.try_format_pattern(message_id, Some(&args))
     }
 }
 
