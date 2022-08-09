@@ -1,4 +1,7 @@
-use std::{marker::PhantomData, path::Path};
+use std::{
+    marker::PhantomData,
+    path::{Path, PathBuf},
+};
 
 use crate::{fluent::FluentBundle, plugin::LocalizationStage, CurrentLocale, LocalizationSource};
 use bevy::prelude::*;
@@ -62,21 +65,55 @@ impl AddLocalization for App {
         let locale = self.world.resource::<CurrentLocale>();
         let asset_server = self.world.resource::<AssetServer>();
 
-        let ftl_path = Path::new(&T::folder_path()).join(format!("{}.ftl", locale.0));
+        let ftl_path = get_ftl_path::<T>(locale);
         let handle: Handle<LocalizationSource> = asset_server.load(ftl_path);
 
         let localization = Localization::<T>::new(handle);
 
-        self.insert_resource(localization).add_system_to_stage(
-            LocalizationStage::UpdateLocalization,
-            update_localization::<T>,
-        );
+        self.insert_resource(localization)
+            // First, check if the locale changed
+            .add_system_to_stage(
+                LocalizationStage::HandleChanges,
+                update_localization_on_locale_change::<T>,
+            )
+            // Then check if the asset changed
+            // A locale change will also reload the assets, so this has to happen afterwards
+            .add_system_to_stage(
+                LocalizationStage::HandleChanges,
+                update_localization_on_asset_change::<T>
+                    .after(update_localization_on_locale_change::<T>),
+            );
 
         self
     }
 }
 
-fn update_localization<T: LocalizationFolder>(
+/// Get the path of the FTL file for the given locale in the localization folder.
+fn get_ftl_path<T: LocalizationFolder>(locale: &CurrentLocale) -> PathBuf {
+    Path::new(&T::folder_path()).join(format!("{}.ftl", locale.0))
+}
+
+/// Load the corresponding localization file when the locale has been changed.
+fn update_localization_on_locale_change<T: LocalizationFolder>(
+    mut localization: ResMut<Localization<T>>,
+    asset_server: ResMut<AssetServer>,
+    cur_locale: Res<CurrentLocale>,
+) {
+    if cur_locale.is_changed() {
+        let ftl_path = get_ftl_path::<T>(&cur_locale);
+        let handle: Handle<LocalizationSource> = asset_server.load(ftl_path);
+
+        localization.handle = handle;
+    }
+}
+
+/// Update the localization resource when a localization asset has been changed.
+///
+/// This happens in the following scenarios:
+/// - The localization file has been loaded for the first time.
+/// - The localization file has been edited and hot-reloading is enabled.
+/// - The locale has been changed, so a new localization file has been loaded.
+fn update_localization_on_asset_change<T: LocalizationFolder>(
     mut localization: ResMut<Localization<T>>,
     mut ev_asset: EventReader<AssetEvent<LocalizationSource>>,
     assets: ResMut<Assets<LocalizationSource>>,
