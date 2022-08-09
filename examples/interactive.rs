@@ -30,6 +30,7 @@ fn main() {
         .add_system(simple_text_update_system)
         .add_system(parameterized_text_update_system)
         .add_system(locale_button_system)
+        .add_system(count_button_system)
         .run();
 }
 
@@ -51,7 +52,13 @@ struct WelcomeText;
 struct AppleText;
 
 /// The count for the parameterized text.
-struct AppleCount(i32);
+struct AppleCount(usize);
+
+#[derive(Component)]
+struct CountIncrementButton;
+
+#[derive(Component)]
+struct CountDecrementButton;
 
 #[derive(Component)]
 struct EnglishButton;
@@ -125,6 +132,33 @@ fn locale_button_system(
     }
 }
 
+/// Update the locale when the buttons are clicked.
+fn count_button_system(
+    mut count: ResMut<AppleCount>,
+    mut interaction_query: Query<
+        (
+            &Interaction,
+            Option<&CountIncrementButton>,
+            Option<&CountDecrementButton>,
+        ),
+        (Changed<Interaction>, With<Button>),
+    >,
+) {
+    for (interaction, increment, decrement) in interaction_query.iter_mut() {
+        match *interaction {
+            Interaction::Clicked => {
+                // Change the count
+                if increment.is_some() {
+                    count.0 = count.0.saturating_add(1);
+                } else if decrement.is_some() {
+                    count.0 = count.0.saturating_sub(1);
+                }
+            }
+            _ => (),
+        }
+    }
+}
+
 /// Spawn the camera and text node
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn_bundle(UiCameraBundle::default());
@@ -184,86 +218,117 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 })
                 .insert(AppleText);
 
+            // Counter
+            parent
+                .spawn_bundle(NodeBundle {
+                    style: Style {
+                        flex_direction: FlexDirection::Row,
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    color: UiColor(Color::NONE),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn_bundle(TextBundle {
+                        text: Text::with_section(
+                            "Counter: ",
+                            TextStyle {
+                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                font_size: 40.0,
+                                color: Color::WHITE,
+                            },
+                            TextAlignment {
+                                horizontal: HorizontalAlign::Center,
+                                ..default()
+                            },
+                        ),
+                        ..default()
+                    });
+
+                    parent
+                        .spawn_bundle(get_locale_button_bundle())
+                        .with_children(|parent| {
+                            parent.spawn_bundle(get_button_text_bundle("+", asset_server.clone()));
+                        })
+                        .insert(CountIncrementButton);
+
+                    parent
+                        .spawn_bundle(get_locale_button_bundle())
+                        .with_children(|parent| {
+                            parent.spawn_bundle(get_button_text_bundle("-", asset_server.clone()));
+                        })
+                        .insert(CountDecrementButton);
+                });
+
             // Buttons to change the language
             parent
-                .spawn_bundle(ButtonBundle {
+                .spawn_bundle(NodeBundle {
                     style: Style {
-                        size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-                        margin: Rect::all(Val::Auto),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
+                        flex_direction: FlexDirection::Row,
                         ..default()
                     },
+                    color: UiColor(Color::NONE),
                     ..default()
                 })
                 .with_children(|parent| {
-                    parent.spawn_bundle(TextBundle {
-                        text: Text::with_section(
-                            "English",
-                            TextStyle {
-                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                font_size: 40.0,
-                                color: Color::BLACK,
-                            },
-                            Default::default(),
-                        ),
-                        ..default()
-                    });
-                })
-                .insert(EnglishButton);
+                    parent
+                        .spawn_bundle(get_locale_button_bundle())
+                        .with_children(|parent| {
+                            parent.spawn_bundle(get_button_text_bundle(
+                                "English",
+                                asset_server.clone(),
+                            ));
+                        })
+                        .insert(EnglishButton);
 
-            parent
-                .spawn_bundle(ButtonBundle {
-                    style: Style {
-                        size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-                        margin: Rect::all(Val::Auto),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    ..default()
-                })
-                .with_children(|parent| {
-                    parent.spawn_bundle(TextBundle {
-                        text: Text::with_section(
-                            "Deutsch",
-                            TextStyle {
-                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                font_size: 40.0,
-                                color: Color::BLACK,
-                            },
-                            Default::default(),
-                        ),
-                        ..default()
-                    });
-                })
-                .insert(GermanButton);
+                    parent
+                        .spawn_bundle(get_locale_button_bundle())
+                        .with_children(|parent| {
+                            parent.spawn_bundle(get_button_text_bundle(
+                                "Deutsch",
+                                asset_server.clone(),
+                            ));
+                        })
+                        .insert(GermanButton);
 
-            parent
-                .spawn_bundle(ButtonBundle {
-                    style: Style {
-                        size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-                        margin: Rect::all(Val::Auto),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    ..default()
-                })
-                .with_children(|parent| {
-                    parent.spawn_bundle(TextBundle {
-                        text: Text::with_section(
-                            "Français",
-                            TextStyle {
-                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                font_size: 40.0,
-                                color: Color::BLACK,
-                            },
-                            Default::default(),
-                        ),
-                        ..default()
-                    });
-                })
-                .insert(FrenchButton);
+                    parent
+                        .spawn_bundle(get_locale_button_bundle())
+                        .with_children(|parent| {
+                            parent.spawn_bundle(get_button_text_bundle(
+                                "Français",
+                                asset_server.clone(),
+                            ));
+                        })
+                        .insert(FrenchButton);
+                });
         });
+}
+
+fn get_locale_button_bundle() -> ButtonBundle {
+    ButtonBundle {
+        style: Style {
+            size: Size::new(Val::Px(150.0), Val::Px(65.0)),
+            margin: Rect::all(Val::Px(5.0)),
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::Center,
+            ..default()
+        },
+        ..default()
+    }
+}
+
+fn get_button_text_bundle(value: &str, asset_server: AssetServer) -> TextBundle {
+    TextBundle {
+        text: Text::with_section(
+            value,
+            TextStyle {
+                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                font_size: 40.0,
+                color: Color::BLACK,
+            },
+            Default::default(),
+        ),
+        ..default()
+    }
 }
