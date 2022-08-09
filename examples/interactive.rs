@@ -11,15 +11,6 @@ const EN_US: LanguageIdentifier = langid!("en-US");
 const DE: LanguageIdentifier = langid!("de");
 const FR: LanguageIdentifier = langid!("fr");
 
-struct ExampleLocalization;
-
-// TODO: Write a derive macro for this
-impl LocalizationFolder for ExampleLocalization {
-    fn folder_path() -> String {
-        "strings/interactive".to_string()
-    }
-}
-
 fn main() {
     App::new()
         // Optional: Enable hot reloading
@@ -31,11 +22,20 @@ fn main() {
         .add_plugin(LocalizationPlugin)
         .insert_resource(CurrentLocale::new(EN_US))
         // Add the localization resource for the given folder
-        .add_localization::<ExampleLocalization>()
+        .add_localization::<InteractiveLocalizationFolder>()
         .add_startup_system(setup)
         .add_system(text_update_system)
-        .add_system(button_system)
+        .add_system(locale_button_system)
         .run();
+}
+
+struct InteractiveLocalizationFolder;
+
+// TODO: Write a derive macro for this
+impl LocalizationFolder for InteractiveLocalizationFolder {
+    fn folder_path() -> String {
+        "strings/interactive".to_string()
+    }
 }
 
 // A unit struct to help identify the localized text component, since there may be many Text components
@@ -50,6 +50,53 @@ struct GermanButton;
 
 #[derive(Component)]
 struct FrenchButton;
+
+/// Update the displayed text, based on the localization files.
+fn text_update_system(
+    localization: Res<Localization<InteractiveLocalizationFolder>>,
+    mut query: Query<&mut Text, With<LocalizedText>>,
+) {
+    if let Ok(mut text) = query.get_single_mut() {
+        if let Ok(msg) = localization.try_get_message("hello") {
+            // Update the text with the localization
+            text.sections[0].value = msg;
+        }
+    }
+}
+
+/// Update the locale when the buttons are clicked.
+fn locale_button_system(
+    mut current_locale: ResMut<CurrentLocale>,
+    mut interaction_query: Query<
+        (
+            &Interaction,
+            Option<&EnglishButton>,
+            Option<&GermanButton>,
+            Option<&FrenchButton>,
+        ),
+        (Changed<Interaction>, With<Button>),
+    >,
+) {
+    for (interaction, english, german, french) in interaction_query.iter_mut() {
+        match *interaction {
+            Interaction::Clicked => {
+                // Determine the language based on which button got pressed
+                let language_id = if let Some(_) = english {
+                    EN_US
+                } else if let Some(_) = german {
+                    DE
+                } else if let Some(_) = french {
+                    FR
+                } else {
+                    continue;
+                };
+
+                current_locale.update(language_id);
+            }
+            _ => (),
+        }
+    }
+}
 
 /// Spawn the camera and text node
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -161,49 +208,4 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             });
         })
         .insert(FrenchButton);
-}
-
-fn text_update_system(
-    localization: Res<Localization<ExampleLocalization>>,
-    mut query: Query<&mut Text, With<LocalizedText>>,
-) {
-    if let Ok(mut text) = query.get_single_mut() {
-        if let Ok(msg) = localization.try_get_message("hello") {
-            // Update the text with the localization
-            text.sections[0].value = msg;
-        }
-    }
-}
-
-fn button_system(
-    mut current_locale: ResMut<CurrentLocale>,
-    mut interaction_query: Query<
-        (
-            &Interaction,
-            Option<&EnglishButton>,
-            Option<&GermanButton>,
-            Option<&FrenchButton>,
-        ),
-        (Changed<Interaction>, With<Button>),
-    >,
-) {
-    for (interaction, english, german, french) in interaction_query.iter_mut() {
-        match *interaction {
-            Interaction::Clicked => {
-                // Determine the language based on which button got pressed
-                let language_id = if let Some(_) = english {
-                    EN_US
-                } else if let Some(_) = german {
-                    DE
-                } else if let Some(_) = french {
-                    FR
-                } else {
-                    continue;
-                };
-
-                current_locale.update(language_id);
-            }
-            _ => (),
-        }
-    }
 }
