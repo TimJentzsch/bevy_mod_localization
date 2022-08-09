@@ -5,6 +5,7 @@ use bevy_prototype_fluent::{
     plugin::LocalizationPlugin,
     CurrentLocale,
 };
+use fluent::FluentArgs;
 use unic_langid::{langid, LanguageIdentifier};
 
 const EN_US: LanguageIdentifier = langid!("en-US");
@@ -19,12 +20,15 @@ fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .add_plugin(LocalizationPlugin)
         .insert_resource(CurrentLocale::new(EN_US))
+        .add_plugin(LocalizationPlugin)
         // Add the localization resource for the given folder
         .add_localization::<InteractiveLocalizationFolder>()
+        // Initialize the count to 0
+        .insert_resource(AppleCount(0))
         .add_startup_system(setup)
-        .add_system(text_update_system)
+        .add_system(simple_text_update_system)
+        .add_system(parameterized_text_update_system)
         .add_system(locale_button_system)
         .run();
 }
@@ -38,9 +42,16 @@ impl LocalizationFolder for InteractiveLocalizationFolder {
     }
 }
 
-// A unit struct to help identify the localized text component, since there may be many Text components
+/// Tag for a text with a simple message.
 #[derive(Component)]
-struct LocalizedText;
+struct WelcomeText;
+
+/// Tag for a text that takes a count as argument.
+#[derive(Component)]
+struct AppleText;
+
+/// The count for the parameterized text.
+struct AppleCount(i32);
 
 #[derive(Component)]
 struct EnglishButton;
@@ -52,12 +63,28 @@ struct GermanButton;
 struct FrenchButton;
 
 /// Update the displayed text, based on the localization files.
-fn text_update_system(
+fn simple_text_update_system(
     localization: Res<Localization<InteractiveLocalizationFolder>>,
-    mut query: Query<&mut Text, With<LocalizedText>>,
+    mut query: Query<&mut Text, With<WelcomeText>>,
 ) {
     if let Ok(mut text) = query.get_single_mut() {
         if let Ok(msg) = localization.try_get_message("hello") {
+            // Update the text with the localization
+            text.sections[0].value = msg;
+        }
+    }
+}
+
+fn parameterized_text_update_system(
+    localization: Res<Localization<InteractiveLocalizationFolder>>,
+    mut query: Query<&mut Text, With<AppleText>>,
+    count: Res<AppleCount>,
+) {
+    if let Ok(mut text) = query.get_single_mut() {
+        let mut args = FluentArgs::new();
+        args.set("count", count.0);
+
+        if let Ok(msg) = localization.try_format_message("apple-count", args) {
             // Update the text with the localization
             text.sections[0].value = msg;
         }
@@ -103,109 +130,140 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn_bundle(UiCameraBundle::default());
 
     commands
-        .spawn_bundle(TextBundle {
+        .spawn_bundle(NodeBundle {
             style: Style {
-                align_self: AlignSelf::FlexEnd,
-                position_type: PositionType::Absolute,
+                size: Size {
+                    width: Val::Percent(100.0),
+                    height: Val::Percent(100.0),
+                },
+                flex_direction: FlexDirection::ColumnReverse,
+                align_items: AlignItems::Center,
                 ..default()
             },
-
-            text: Text::with_section(
-                // This will later be replaced by the localized text
-                "",
-                TextStyle {
-                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                    font_size: 100.0,
-                    color: Color::WHITE,
-                },
-                // Note: You can use `Default::default()` in place of the `TextAlignment`
-                TextAlignment {
-                    horizontal: HorizontalAlign::Center,
+            color: UiColor(Color::NONE),
+            ..default()
+        })
+        .with_children(|parent| {
+            // Node for simple text
+            parent
+                .spawn_bundle(TextBundle {
+                    text: Text::with_section(
+                        // This will later be replaced by the localized text
+                        "",
+                        TextStyle {
+                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: 100.0,
+                            color: Color::WHITE,
+                        },
+                        TextAlignment {
+                            horizontal: HorizontalAlign::Center,
+                            ..default()
+                        },
+                    ),
                     ..default()
-                },
-            ),
-            ..default()
-        })
-        .insert(LocalizedText);
+                })
+                .insert(WelcomeText);
 
-    commands
-        .spawn_bundle(ButtonBundle {
-            style: Style {
-                size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-                margin: Rect::all(Val::Auto),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                ..default()
-            },
-            ..default()
-        })
-        .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
-                text: Text::with_section(
-                    "English",
-                    TextStyle {
-                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                        font_size: 40.0,
-                        color: Color::BLACK,
-                    },
-                    Default::default(),
-                ),
-                ..default()
-            });
-        })
-        .insert(EnglishButton);
+            // Node for parameterized text
+            parent
+                .spawn_bundle(TextBundle {
+                    text: Text::with_section(
+                        // This will later be replaced by the localized text
+                        "",
+                        TextStyle {
+                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: 100.0,
+                            color: Color::WHITE,
+                        },
+                        TextAlignment {
+                            horizontal: HorizontalAlign::Center,
+                            ..default()
+                        },
+                    ),
+                    ..default()
+                })
+                .insert(AppleText);
 
-    commands
-        .spawn_bundle(ButtonBundle {
-            style: Style {
-                size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-                margin: Rect::all(Val::Auto),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                ..default()
-            },
-            ..default()
-        })
-        .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
-                text: Text::with_section(
-                    "Deutsch",
-                    TextStyle {
-                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                        font_size: 40.0,
-                        color: Color::BLACK,
+            // Buttons to change the language
+            parent
+                .spawn_bundle(ButtonBundle {
+                    style: Style {
+                        size: Size::new(Val::Px(150.0), Val::Px(65.0)),
+                        margin: Rect::all(Val::Auto),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        ..default()
                     },
-                    Default::default(),
-                ),
-                ..default()
-            });
-        })
-        .insert(GermanButton);
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn_bundle(TextBundle {
+                        text: Text::with_section(
+                            "English",
+                            TextStyle {
+                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                font_size: 40.0,
+                                color: Color::BLACK,
+                            },
+                            Default::default(),
+                        ),
+                        ..default()
+                    });
+                })
+                .insert(EnglishButton);
 
-    commands
-        .spawn_bundle(ButtonBundle {
-            style: Style {
-                size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-                margin: Rect::all(Val::Auto),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                ..default()
-            },
-            ..default()
-        })
-        .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
-                text: Text::with_section(
-                    "Français",
-                    TextStyle {
-                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                        font_size: 40.0,
-                        color: Color::BLACK,
+            parent
+                .spawn_bundle(ButtonBundle {
+                    style: Style {
+                        size: Size::new(Val::Px(150.0), Val::Px(65.0)),
+                        margin: Rect::all(Val::Auto),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        ..default()
                     },
-                    Default::default(),
-                ),
-                ..default()
-            });
-        })
-        .insert(FrenchButton);
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn_bundle(TextBundle {
+                        text: Text::with_section(
+                            "Deutsch",
+                            TextStyle {
+                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                font_size: 40.0,
+                                color: Color::BLACK,
+                            },
+                            Default::default(),
+                        ),
+                        ..default()
+                    });
+                })
+                .insert(GermanButton);
+
+            parent
+                .spawn_bundle(ButtonBundle {
+                    style: Style {
+                        size: Size::new(Val::Px(150.0), Val::Px(65.0)),
+                        margin: Rect::all(Val::Auto),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn_bundle(TextBundle {
+                        text: Text::with_section(
+                            "Français",
+                            TextStyle {
+                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                font_size: 40.0,
+                                color: Color::BLACK,
+                            },
+                            Default::default(),
+                        ),
+                        ..default()
+                    });
+                })
+                .insert(FrenchButton);
+        });
 }
