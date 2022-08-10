@@ -1,11 +1,6 @@
 use bevy::{asset::AssetServerSettings, prelude::*};
 use bevy_prototype_fluent::prelude::*;
 use fluent::FluentArgs;
-use unic_langid::{langid, LanguageIdentifier};
-
-const EN_US: LanguageIdentifier = langid!("en-US");
-const DE: LanguageIdentifier = langid!("de");
-const FR: LanguageIdentifier = langid!("fr");
 
 fn main() {
     App::new()
@@ -15,7 +10,7 @@ fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .insert_resource(Locale::new(EN_US))
+        .insert_resource(Locale::new("en-US"))
         .add_plugin(LocalizationPlugin)
         // Add the localization resource for the given folder
         .add_localization::<InteractiveLocalizationFolder>()
@@ -111,11 +106,11 @@ fn locale_button_system(
             Interaction::Clicked => {
                 // Determine the language based on which button got pressed
                 let language_id = if let Some(_) = english {
-                    EN_US
+                    "en-US"
                 } else if let Some(_) = german {
-                    DE
+                    "de"
                 } else if let Some(_) = french {
-                    FR
+                    "fr"
                 } else {
                     continue;
                 };

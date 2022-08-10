@@ -1,25 +1,11 @@
 use bevy::{prelude::*, reflect::TypeUuid};
-use unic_langid::LanguageIdentifier;
 
 mod fluent;
 mod loaders;
+pub mod locale;
 pub mod localization;
 pub mod plugin;
 pub mod prelude;
-
-/// The currently active locale
-#[derive(PartialEq, Eq, Debug, Clone)]
-pub struct Locale(LanguageIdentifier);
-
-impl Locale {
-    pub fn new(language_id: LanguageIdentifier) -> Self {
-        Locale(language_id)
-    }
-
-    pub fn update(&mut self, language_id: LanguageIdentifier) {
-        self.0 = language_id;
-    }
-}
 
 #[derive(Debug, TypeUuid)]
 #[uuid = "c807fa98-31ad-4d85-8988-ab4313cced3f"]

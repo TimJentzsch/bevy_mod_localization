@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{fluent::FluentBundle, plugin::LocalizationStage, Locale, LocalizationSource};
+use crate::{fluent::FluentBundle, locale::Locale, plugin::LocalizationStage, LocalizationSource};
 use bevy::prelude::*;
 use fluent::{FluentArgs, FluentResource};
 

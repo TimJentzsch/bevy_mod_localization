@@ -3,7 +3,6 @@ use bevy::{
     prelude::*,
 };
 use bevy_prototype_fluent::prelude::*;
-use unic_langid::langid;
 
 fn main() {
     App::new()
@@ -13,7 +12,7 @@ fn main() {
             ..default()
         })
         // Define the locale that you want to use by default
-        .insert_resource(Locale::new(langid!("en-US")))
+        .insert_resource(Locale::new("en-US"))
         .add_plugins(MinimalPlugins)
         .add_plugin(AssetPlugin)
         .add_plugin(LocalizationPlugin)
