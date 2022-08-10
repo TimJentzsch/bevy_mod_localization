@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{fluent::FluentBundle, plugin::LocalizationStage, CurrentLocale, LocalizationSource};
+use crate::{fluent::FluentBundle, plugin::LocalizationStage, Locale, LocalizationSource};
 use bevy::prelude::*;
 use fluent::{FluentArgs, FluentResource};
 
@@ -82,7 +82,7 @@ impl AddLocalization for App {
             return self;
         }
 
-        let locale = self.world.resource::<CurrentLocale>();
+        let locale = self.world.resource::<Locale>();
         let asset_server = self.world.resource::<AssetServer>();
 
         let ftl_path = get_ftl_path::<T>(locale);
@@ -109,7 +109,7 @@ impl AddLocalization for App {
 }
 
 /// Get the path of the FTL file for the given locale in the localization folder.
-fn get_ftl_path<T: LocalizationFolder>(locale: &CurrentLocale) -> PathBuf {
+fn get_ftl_path<T: LocalizationFolder>(locale: &Locale) -> PathBuf {
     Path::new(&T::folder_path()).join(format!("{}.ftl", locale.0))
 }
 
@@ -117,7 +117,7 @@ fn get_ftl_path<T: LocalizationFolder>(locale: &CurrentLocale) -> PathBuf {
 fn update_localization_on_locale_change<T: LocalizationFolder>(
     mut localization: ResMut<Localization<T>>,
     asset_server: ResMut<AssetServer>,
-    cur_locale: Res<CurrentLocale>,
+    cur_locale: Res<Locale>,
 ) {
     if cur_locale.is_changed() {
         let ftl_path = get_ftl_path::<T>(&cur_locale);
@@ -137,7 +137,7 @@ fn update_localization_on_asset_change<T: LocalizationFolder>(
     mut localization: ResMut<Localization<T>>,
     mut ev_asset: EventReader<AssetEvent<LocalizationSource>>,
     assets: ResMut<Assets<LocalizationSource>>,
-    cur_locale: Res<CurrentLocale>,
+    cur_locale: Res<Locale>,
 ) {
     for ev in ev_asset.iter() {
         match ev {

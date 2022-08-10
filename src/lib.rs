@@ -8,11 +8,11 @@ pub mod plugin;
 
 /// The currently active locale
 #[derive(PartialEq, Eq, Debug, Clone)]
-pub struct CurrentLocale(LanguageIdentifier);
+pub struct Locale(LanguageIdentifier);
 
-impl CurrentLocale {
+impl Locale {
     pub fn new(language_id: LanguageIdentifier) -> Self {
-        CurrentLocale(language_id)
+        Locale(language_id)
     }
 
     pub fn update(&mut self, language_id: LanguageIdentifier) {

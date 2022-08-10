@@ -3,7 +3,7 @@ use bevy_prototype_fluent::{
     localization::AddLocalization,
     localization::{Localization, LocalizationFolder},
     plugin::LocalizationPlugin,
-    CurrentLocale,
+    Locale,
 };
 use fluent::FluentArgs;
 use unic_langid::{langid, LanguageIdentifier};
@@ -20,7 +20,7 @@ fn main() {
             ..default()
         })
         .add_plugins(DefaultPlugins)
-        .insert_resource(CurrentLocale::new(EN_US))
+        .insert_resource(Locale::new(EN_US))
         .add_plugin(LocalizationPlugin)
         // Add the localization resource for the given folder
         .add_localization::<InteractiveLocalizationFolder>()
@@ -100,7 +100,7 @@ fn parameterized_text_update_system(
 
 /// Update the locale when the buttons are clicked.
 fn locale_button_system(
-    mut current_locale: ResMut<CurrentLocale>,
+    mut current_locale: ResMut<Locale>,
     mut interaction_query: Query<
         (
             &Interaction,

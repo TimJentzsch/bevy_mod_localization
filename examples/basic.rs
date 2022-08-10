@@ -6,7 +6,7 @@ use bevy_prototype_fluent::{
     localization::AddLocalization,
     localization::{Localization, LocalizationFolder},
     plugin::LocalizationPlugin,
-    CurrentLocale,
+    Locale,
 };
 use unic_langid::langid;
 
@@ -18,7 +18,7 @@ fn main() {
             ..default()
         })
         // Define the locale that you want to use by default
-        .insert_resource(CurrentLocale::new(langid!("en-US")))
+        .insert_resource(Locale::new(langid!("en-US")))
         .add_plugins(MinimalPlugins)
         .add_plugin(AssetPlugin)
         .add_plugin(LocalizationPlugin)
