@@ -1,10 +1,5 @@
 use bevy::{asset::AssetServerSettings, prelude::*};
-use bevy_prototype_fluent::{
-    localization::AddLocalization,
-    localization::{Localization, LocalizationFolder},
-    plugin::LocalizationPlugin,
-    Locale,
-};
+use bevy_prototype_fluent::prelude::*;
 use fluent::FluentArgs;
 use unic_langid::{langid, LanguageIdentifier};
 

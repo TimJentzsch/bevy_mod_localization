@@ -2,12 +2,7 @@ use bevy::{
     asset::{AssetPlugin, AssetServerSettings},
     prelude::*,
 };
-use bevy_prototype_fluent::{
-    localization::AddLocalization,
-    localization::{Localization, LocalizationFolder},
-    plugin::LocalizationPlugin,
-    Locale,
-};
+use bevy_prototype_fluent::prelude::*;
 use unic_langid::langid;
 
 fn main() {

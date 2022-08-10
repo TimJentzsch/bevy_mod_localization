@@ -5,6 +5,7 @@ mod fluent;
 mod loaders;
 pub mod localization;
 pub mod plugin;
+pub mod prelude;
 
 /// The currently active locale
 #[derive(PartialEq, Eq, Debug, Clone)]
