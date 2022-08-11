@@ -24,14 +24,9 @@ fn main() {
         .run();
 }
 
+#[derive(LocalizationFolder)]
+#[folder_path = "strings/interactive"]
 struct InteractiveLocalizationFolder;
-
-// TODO: Write a derive macro for this
-impl LocalizationFolder for InteractiveLocalizationFolder {
-    fn folder_path() -> String {
-        "strings/interactive".to_string()
-    }
-}
 
 /// Tag for a text with a simple message.
 #[derive(Component)]
