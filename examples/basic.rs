@@ -23,14 +23,9 @@ fn main() {
         .run();
 }
 
+#[derive(LocalizationFolder)]
+#[folder_path = "strings/basic"]
 struct BasicLocalizationFolder;
-
-// TODO: Write a derive macro for this
-impl LocalizationFolder for BasicLocalizationFolder {
-    fn folder_path() -> String {
-        "strings/basic".to_string()
-    }
-}
 
 /// Print the text from the localization file.
 fn print_message_system(localization: Res<Localization<BasicLocalizationFolder>>) {

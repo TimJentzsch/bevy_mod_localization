@@ -6,8 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.58"
+bevy_prototype_fluent_derive = { path = "bevy_prototype_fluent_derive" }
 bevy = { version = "0.7.0", default-features = false }
+anyhow = "1.0.58"
 fluent = "0.16.0"
 intl-memoizer = "0.5.1"
 unic-langid = { version = "0.9.0", features = ["macros"] }
