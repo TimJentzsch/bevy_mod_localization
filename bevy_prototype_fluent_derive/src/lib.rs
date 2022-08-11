@@ -30,9 +30,7 @@ fn impl_localization_folder(ast: &DeriveInput) -> TokenStream {
 
     let gen = quote! {
         impl LocalizationFolder for #name {
-            fn folder_path() -> String {
-                #folder_path.to_string()
-            }
+            const FOLDER_PATH: &'static str = #folder_path;
         }
     };
     gen.into()

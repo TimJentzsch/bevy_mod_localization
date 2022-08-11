@@ -11,7 +11,7 @@ use crate::LocalizationError;
 
 // TODO: Review if the 'static is really needed for world.contains_resource
 pub trait LocalizationFolder: 'static + std::marker::Send + std::marker::Sync {
-    fn folder_path() -> String;
+    const FOLDER_PATH: &'static str;
 }
 
 pub struct Localization<T: LocalizationFolder> {
@@ -110,7 +110,7 @@ impl AddLocalization for App {
 
 /// Get the path of the FTL file for the given locale in the localization folder.
 fn get_ftl_path<T: LocalizationFolder>(locale: &Locale) -> PathBuf {
-    Path::new(&T::folder_path()).join(format!("{}.ftl", locale.0))
+    Path::new(&T::FOLDER_PATH).join(format!("{}.ftl", locale.0))
 }
 
 /// Load the corresponding localization file when the locale has been changed.
