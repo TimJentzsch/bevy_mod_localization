@@ -1,6 +1,10 @@
 use bevy::{asset::AssetStage, prelude::*};
 
-use crate::{loaders::ftl_loader::FtlLoader, LocalizationOutput, LocalizationSource};
+use crate::{
+    loaders::ftl_loader::FtlLoader,
+    locale::{LocaleDefaultFallback, LocaleFallbackMap},
+    LocalizationOutput, LocalizationSource,
+};
 
 /// The names of localization stages in an App Schedule
 #[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
@@ -13,6 +17,9 @@ pub struct LocalizationPlugin;
 
 impl Plugin for LocalizationPlugin {
     fn build(&self, app: &mut App) {
+        app.init_resource::<LocaleFallbackMap>();
+        app.init_resource::<LocaleDefaultFallback>();
+
         // What does this do??
         app.init_non_send_resource::<LocalizationOutput>()
             .add_asset::<LocalizationSource>();

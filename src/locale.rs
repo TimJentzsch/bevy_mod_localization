@@ -115,7 +115,8 @@ impl Locale {
 /// The default locale to fall back to.
 ///
 /// Locale resolution: [`Locale`] -> [`LocaleFallbackMap`] -> [`LocaleDefaultFallback`].
-pub struct LocaleDefaultFallback(pub(crate) LanguageIdentifier);
+#[derive(Debug, Default)]
+pub struct LocaleDefaultFallback(pub(crate) Option<LanguageIdentifier>);
 
 impl LocaleDefaultFallback {
     /// Create a new [`LocaleDefaultFallback`].
@@ -127,7 +128,7 @@ impl LocaleDefaultFallback {
     /// # use bevy_prototype_fluent::prelude::*;
     /// #
     /// App::new()
-    ///     .insert_resource(LocaleDefaultFallback::new("en-US"))
+    ///     .insert_resource(LocaleDefaultFallback::new(Some("en-US")))
     ///     .insert_resource(Locale::new("en-GB"))
     ///     .add_plugin(LocalizationPlugin)
     ///     // -- snip --
@@ -143,13 +144,13 @@ impl LocaleDefaultFallback {
     /// use unic_langid::langid;
     ///
     /// App::new()
-    ///     .insert_resource(LocaleDefaultFallback::new(langid!("en-US")))
+    ///     .insert_resource(LocaleDefaultFallback::new(Some(langid!("en-US"))))
     ///     .add_plugin(LocalizationPlugin)
     ///     // -- snip --
     ///     .run();
     /// ```
-    pub fn new<T: IntoLanguageIdentifier>(locale: T) -> Self {
-        Self(locale.into_language_identifier())
+    pub fn new<T: IntoLanguageIdentifier>(locale: Option<T>) -> Self {
+        Self(locale.map(|into_locale| into_locale.into_language_identifier()))
     }
 
     /// Change the default fallback locale.
@@ -163,11 +164,11 @@ impl LocaleDefaultFallback {
     ///     // This means that if a string is not defined for the current [`Locale`]
     ///     // and no other fallback is specified in the [`LocaleFallbackMap`],
     ///     // then the French string will be taken instead (if available)
-    ///     default_locale.set("fr");
+    ///     default_locale.set(Some("fr"));
     /// }
     /// ```
-    pub fn set<T: IntoLanguageIdentifier>(&mut self, locale: T) {
-        self.0 = locale.into_language_identifier();
+    pub fn set<T: IntoLanguageIdentifier>(&mut self, locale: Option<T>) {
+        self.0 = locale.map(|into_locale| into_locale.into_language_identifier());
     }
 }
 
