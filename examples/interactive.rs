@@ -110,7 +110,7 @@ fn locale_button_system(
                     continue;
                 };
 
-                current_locale.update(language_id);
+                current_locale.set(language_id);
             }
             _ => (),
         }
