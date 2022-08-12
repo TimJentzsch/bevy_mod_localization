@@ -24,3 +24,7 @@ path = "examples/basic.rs"
 [[example]]
 name = "interactive"
 path = "examples/interactive.rs"
+
+[[example]]
+name = "locale_fallback"
+path = "examples/locale_fallback.rs"
