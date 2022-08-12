@@ -200,7 +200,9 @@ fn update_localization_on_locale_change<T: LocalizationFolder>(
     default_fallback: Res<LocaleDefaultFallback>,
 ) {
     if locale.is_changed() || fallback_map.is_changed() || default_fallback.is_changed() {
+        // Compute the new resolution chain
         let resolution_chain = get_resolution_chain(&locale, &fallback_map, &default_fallback);
+
         let handle_keys: Vec<LanguageIdentifier> =
             localization.handle_map.keys().cloned().collect();
 
@@ -220,7 +222,11 @@ fn update_localization_on_locale_change<T: LocalizationFolder>(
             .filter(|lang_id| !resolution_chain.contains(lang_id))
         {
             localization.handle_map.remove(lang_id);
+            localization.bundle_map.remove(lang_id);
         }
+
+        // Update resolution chain
+        localization.resolution_chain = resolution_chain;
     }
 }
 
