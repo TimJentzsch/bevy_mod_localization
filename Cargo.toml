@@ -24,7 +24,3 @@ path = "examples/basic.rs"
 [[example]]
 name = "interactive"
 path = "examples/interactive.rs"
-
-[[example]]
-name = "test"
-path = "examples/test.rs"
