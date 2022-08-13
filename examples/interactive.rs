@@ -2,28 +2,6 @@ use bevy::{asset::AssetServerSettings, prelude::*};
 use bevy_prototype_fluent::prelude::*;
 use fluent::FluentArgs;
 
-fn main() {
-    App::new()
-        // Optional: Enable hot reloading
-        .insert_resource(AssetServerSettings {
-            watch_for_changes: true,
-            ..default()
-        })
-        .add_plugins(DefaultPlugins)
-        .insert_resource(Locale::new("en-US"))
-        .add_plugin(LocalizationPlugin)
-        // Add the localization resource for the given folder
-        .add_localization::<InteractiveLocalizationFolder>()
-        // Initialize the count to 0
-        .insert_resource(AppleCount(0))
-        .add_startup_system(setup)
-        .add_system(simple_text_update_system)
-        .add_system(parameterized_text_update_system)
-        .add_system(locale_button_system)
-        .add_system(count_button_system)
-        .run();
-}
-
 #[derive(LocalizationFolder)]
 #[folder_path = "strings/interactive"]
 struct InteractiveLocalizationFolder;
@@ -46,13 +24,29 @@ struct CountIncrementButton;
 struct CountDecrementButton;
 
 #[derive(Component)]
-struct EnglishButton;
+struct LanguageButton(&'static str);
 
-#[derive(Component)]
-struct GermanButton;
-
-#[derive(Component)]
-struct FrenchButton;
+fn main() {
+    App::new()
+        // Optional: Enable hot reloading
+        .insert_resource(AssetServerSettings {
+            watch_for_changes: true,
+            ..default()
+        })
+        .add_plugins(DefaultPlugins)
+        .insert_resource(Locale::new("en-US"))
+        .add_plugin(LocalizationPlugin)
+        // Add the localization resource for the given folder
+        .add_localization::<InteractiveLocalizationFolder>()
+        // Initialize the count to 0
+        .insert_resource(AppleCount(0))
+        .add_startup_system(setup)
+        .add_system(simple_text_update_system)
+        .add_system(parameterized_text_update_system)
+        .add_system(locale_button_system)
+        .add_system(count_button_system)
+        .run();
+}
 
 /// Update the displayed text, based on the localization files.
 fn simple_text_update_system(
@@ -85,32 +79,17 @@ fn parameterized_text_update_system(
 
 /// Update the locale when the buttons are clicked.
 fn locale_button_system(
-    mut current_locale: ResMut<Locale>,
+    mut locale: ResMut<Locale>,
     mut interaction_query: Query<
-        (
-            &Interaction,
-            Option<&EnglishButton>,
-            Option<&GermanButton>,
-            Option<&FrenchButton>,
-        ),
+        (&Interaction, &LanguageButton),
         (Changed<Interaction>, With<Button>),
     >,
 ) {
-    for (interaction, english, german, french) in interaction_query.iter_mut() {
+    for (interaction, language_button) in interaction_query.iter_mut() {
         match *interaction {
             Interaction::Clicked => {
-                // Determine the language based on which button got pressed
-                let language_id = if let Some(_) = english {
-                    "en-US"
-                } else if let Some(_) = german {
-                    "de"
-                } else if let Some(_) = french {
-                    "fr"
-                } else {
-                    continue;
-                };
-
-                current_locale.set(language_id);
+                // Update the locale to the locale of the button
+                locale.set(language_button.0);
             }
             _ => (),
         }
@@ -146,6 +125,8 @@ fn count_button_system(
 
 /// Spawn the camera and text node
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let font = asset_server.load("fonts/FiraSans-Bold.ttf");
+
     commands.spawn_bundle(UiCameraBundle::default());
 
     commands
@@ -170,7 +151,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         // This will later be replaced by the localized text
                         "",
                         TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: font.clone(),
                             font_size: 100.0,
                             color: Color::WHITE,
                         },
@@ -190,7 +171,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         // This will later be replaced by the localized text
                         "",
                         TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: font.clone(),
                             font_size: 100.0,
                             color: Color::WHITE,
                         },
@@ -219,7 +200,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                         text: Text::with_section(
                             "Counter: ",
                             TextStyle {
-                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                font: font.clone(),
                                 font_size: 40.0,
                                 color: Color::WHITE,
                             },
@@ -234,14 +215,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     parent
                         .spawn_bundle(get_locale_button_bundle())
                         .with_children(|parent| {
-                            parent.spawn_bundle(get_button_text_bundle("+", asset_server.clone()));
+                            parent.spawn_bundle(get_button_text_bundle("+", font.clone()));
                         })
                         .insert(CountIncrementButton);
 
                     parent
                         .spawn_bundle(get_locale_button_bundle())
                         .with_children(|parent| {
-                            parent.spawn_bundle(get_button_text_bundle("-", asset_server.clone()));
+                            parent.spawn_bundle(get_button_text_bundle("-", font.clone()));
                         })
                         .insert(CountDecrementButton);
                 });
@@ -257,35 +238,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ..default()
                 })
                 .with_children(|parent| {
-                    parent
-                        .spawn_bundle(get_locale_button_bundle())
-                        .with_children(|parent| {
-                            parent.spawn_bundle(get_button_text_bundle(
-                                "English",
-                                asset_server.clone(),
-                            ));
-                        })
-                        .insert(EnglishButton);
-
-                    parent
-                        .spawn_bundle(get_locale_button_bundle())
-                        .with_children(|parent| {
-                            parent.spawn_bundle(get_button_text_bundle(
-                                "Deutsch",
-                                asset_server.clone(),
-                            ));
-                        })
-                        .insert(GermanButton);
-
-                    parent
-                        .spawn_bundle(get_locale_button_bundle())
-                        .with_children(|parent| {
-                            parent.spawn_bundle(get_button_text_bundle(
-                                "Français",
-                                asset_server.clone(),
-                            ));
-                        })
-                        .insert(FrenchButton);
+                    for locale in ["en-US", "de", "fr"] {
+                        parent
+                            .spawn_bundle(get_locale_button_bundle())
+                            .with_children(|parent| {
+                                parent.spawn_bundle(get_button_text_bundle(locale, font.clone()));
+                            })
+                            .insert(LanguageButton(locale));
+                    }
                 });
         });
 }
@@ -303,12 +263,12 @@ fn get_locale_button_bundle() -> ButtonBundle {
     }
 }
 
-fn get_button_text_bundle(value: &str, asset_server: AssetServer) -> TextBundle {
+fn get_button_text_bundle(value: &str, font: Handle<Font>) -> TextBundle {
     TextBundle {
         text: Text::with_section(
             value,
             TextStyle {
-                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                font,
                 font_size: 40.0,
                 color: Color::BLACK,
             },
