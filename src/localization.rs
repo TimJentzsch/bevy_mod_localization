@@ -72,15 +72,16 @@ impl<T: LocalizationFolder> Localization<T> {
         args: Option<&FluentArgs>,
     ) -> Result<String, LocalizationError> {
         for lang_id in &self.resolution_chain {
-            if let Some(bundle) = self.bundle_map.get(lang_id)
-            && let Some(msg) = bundle.get_message(message_id) {
-                let mut errors = vec![];
+            if let Some(bundle) = self.bundle_map.get(lang_id) {
+                if let Some(msg) = bundle.get_message(message_id) {
+                    let mut errors = vec![];
 
-                if let Some(pattern) = msg.value() {
-                    let formatted_message = bundle.format_pattern(pattern, args, &mut errors);
+                    if let Some(pattern) = msg.value() {
+                        let formatted_message = bundle.format_pattern(pattern, args, &mut errors);
 
-                    if errors.is_empty() {
-                        return Ok(formatted_message.to_string());
+                        if errors.is_empty() {
+                            return Ok(formatted_message.to_string());
+                        }
                     }
                 }
             }
