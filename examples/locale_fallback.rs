@@ -76,7 +76,7 @@ fn update_text_system(
 
 /// Spawn the camera and text nodes.
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn_bundle(UiCameraBundle::default());
+    commands.spawn_bundle(Camera2dBundle::default());
 
     commands
         .spawn_bundle(NodeBundle {
@@ -99,17 +99,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             for component in [MessageId("first"), MessageId("second"), MessageId("third")] {
                 parent
                     .spawn_bundle(TextBundle {
-                        text: Text::with_section(
+                        text: Text::from_section(
                             // This will later be replaced by the localized text
                             "",
                             TextStyle {
                                 font: font_handle.clone(),
                                 font_size: 60.0,
                                 color: Color::WHITE,
-                            },
-                            TextAlignment {
-                                horizontal: HorizontalAlign::Center,
-                                ..default()
                             },
                         ),
                         ..default()

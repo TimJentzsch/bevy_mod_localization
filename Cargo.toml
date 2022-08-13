@@ -7,15 +7,19 @@ edition = "2021"
 
 [dependencies]
 bevy_prototype_fluent_derive = { path = "bevy_prototype_fluent_derive" }
-bevy = { version = "0.7.0", default-features = false }
 anyhow = "1.0.58"
 fluent = "0.16.0"
 intl-memoizer = "0.5.1"
 unic-langid = { version = "0.9.0", features = ["macros"] }
 
+[dependencies.bevy]
+version = "0.8.0"
+default-features = false
+features = ["bevy_asset"]
+
 [dev-dependencies]
 # TODO: Only use features that we need in the examples
-bevy = { version = "0.7.0", features = ["bevy_ui"] }
+bevy = { version = "0.8.0", features = ["bevy_ui"] }
 
 [[example]]
 name = "basic"

@@ -127,7 +127,7 @@ fn count_button_system(
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font = asset_server.load("fonts/FiraSans-Bold.ttf");
 
-    commands.spawn_bundle(UiCameraBundle::default());
+    commands.spawn_bundle(Camera2dBundle::default());
 
     commands
         .spawn_bundle(NodeBundle {
@@ -147,17 +147,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             // Node for simple text
             parent
                 .spawn_bundle(TextBundle {
-                    text: Text::with_section(
+                    text: Text::from_section(
                         // This will later be replaced by the localized text
                         "",
                         TextStyle {
                             font: font.clone(),
                             font_size: 100.0,
                             color: Color::WHITE,
-                        },
-                        TextAlignment {
-                            horizontal: HorizontalAlign::Center,
-                            ..default()
                         },
                     ),
                     ..default()
@@ -167,17 +163,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             // Node for parameterized text
             parent
                 .spawn_bundle(TextBundle {
-                    text: Text::with_section(
+                    text: Text::from_section(
                         // This will later be replaced by the localized text
                         "",
                         TextStyle {
                             font: font.clone(),
                             font_size: 100.0,
                             color: Color::WHITE,
-                        },
-                        TextAlignment {
-                            horizontal: HorizontalAlign::Center,
-                            ..default()
                         },
                     ),
                     ..default()
@@ -197,16 +189,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 })
                 .with_children(|parent| {
                     parent.spawn_bundle(TextBundle {
-                        text: Text::with_section(
+                        text: Text::from_section(
                             "Counter: ",
                             TextStyle {
                                 font: font.clone(),
                                 font_size: 40.0,
                                 color: Color::WHITE,
-                            },
-                            TextAlignment {
-                                horizontal: HorizontalAlign::Center,
-                                ..default()
                             },
                         ),
                         ..default()
@@ -254,7 +242,7 @@ fn get_locale_button_bundle() -> ButtonBundle {
     ButtonBundle {
         style: Style {
             size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-            margin: Rect::all(Val::Px(5.0)),
+            margin: UiRect::all(Val::Px(5.0)),
             justify_content: JustifyContent::Center,
             align_items: AlignItems::Center,
             ..default()
@@ -265,14 +253,13 @@ fn get_locale_button_bundle() -> ButtonBundle {
 
 fn get_button_text_bundle(value: &str, font: Handle<Font>) -> TextBundle {
     TextBundle {
-        text: Text::with_section(
+        text: Text::from_section(
             value,
             TextStyle {
                 font,
                 font_size: 40.0,
                 color: Color::BLACK,
             },
-            Default::default(),
         ),
         ..default()
     }
