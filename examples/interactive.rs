@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+
 use bevy::{asset::AssetServerSettings, prelude::*};
 use bevy_prototype_fluent::prelude::*;
 use fluent::FluentArgs;
