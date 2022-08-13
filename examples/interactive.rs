@@ -86,12 +86,9 @@ fn locale_button_system(
     >,
 ) {
     for (interaction, language_button) in interaction_query.iter_mut() {
-        match *interaction {
-            Interaction::Clicked => {
-                // Update the locale to the locale of the button
-                locale.set(language_button.0);
-            }
-            _ => (),
+        if *interaction == Interaction::Clicked {
+            // Update the locale to the locale of the button
+            locale.set(language_button.0);
         }
     }
 }
@@ -109,16 +106,13 @@ fn count_button_system(
     >,
 ) {
     for (interaction, increment, decrement) in interaction_query.iter_mut() {
-        match *interaction {
-            Interaction::Clicked => {
-                // Change the count
-                if increment.is_some() {
-                    count.0 = count.0.saturating_add(1);
-                } else if decrement.is_some() {
-                    count.0 = count.0.saturating_sub(1);
-                }
+        if *interaction == Interaction::Clicked {
+            // Change the count
+            if increment.is_some() {
+                count.0 = count.0.saturating_add(1);
+            } else if decrement.is_some() {
+                count.0 = count.0.saturating_sub(1);
             }
-            _ => (),
         }
     }
 }
