@@ -30,9 +30,6 @@ use bevy_prototype_fluent::prelude::*;
 #[folder_path = "strings/locale_fallback"]
 struct FallbackLocalizationFolder;
 
-#[derive(Component)]
-struct MessageId(&'static str);
-
 fn main() {
     let mut fallback_map = LocaleFallbackMap::new();
     fallback_map.add_fallback("en-US", "en-GB");
@@ -54,24 +51,7 @@ fn main() {
         // Add the localization resource for the given folder
         .add_localization::<FallbackLocalizationFolder>()
         .add_startup_system(setup)
-        .add_system(update_text_system)
         .run();
-}
-
-/// Update the text messages.
-///
-/// - Message 1: Defined for `en-US`, `en-GB` and `de`.
-/// - Message 2: Defined for `en-GB` and `de`.
-/// - Message 3: Defined for `de`.
-fn update_text_system(
-    localization: Res<Localization<FallbackLocalizationFolder>>,
-    mut query: Query<(&mut Text, &MessageId)>,
-) {
-    for (mut text, message_id) in query.iter_mut() {
-        if let Ok(msg) = localization.try_get_message(message_id.0) {
-            text.sections[0].value = msg;
-        }
-    }
 }
 
 /// Spawn the camera and text nodes.
@@ -96,7 +76,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             let font_handle = asset_server.load("fonts/FiraSans-Bold.ttf");
 
             // Create three text messages to demonstrate the behavior
-            for component in [MessageId("first"), MessageId("second"), MessageId("third")] {
+            // - Message 1: Defined for `en-US`, `en-GB` and `de`.
+            // - Message 2: Defined for `en-GB` and `de`.
+            // - Message 3: Defined for `de`.
+            for component in [
+                LocalizedText::<FallbackLocalizationFolder>::new("first"),
+                LocalizedText::<FallbackLocalizationFolder>::new("second"),
+                LocalizedText::<FallbackLocalizationFolder>::new("third"),
+            ] {
                 parent
                     .spawn_bundle(TextBundle {
                         text: Text::from_section(
