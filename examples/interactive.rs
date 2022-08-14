@@ -8,10 +8,6 @@ use fluent::FluentArgs;
 #[folder_path = "strings/interactive"]
 struct InteractiveLocalizationFolder;
 
-/// Tag for a text with a simple message.
-#[derive(Component)]
-struct WelcomeText;
-
 /// Tag for a text that takes a count as argument.
 #[derive(Component)]
 struct AppleText;
@@ -43,24 +39,10 @@ fn main() {
         // Initialize the count to 0
         .insert_resource(AppleCount(0))
         .add_startup_system(setup)
-        .add_system(simple_text_update_system)
         .add_system(parameterized_text_update_system)
         .add_system(locale_button_system)
         .add_system(count_button_system)
         .run();
-}
-
-/// Update the displayed text, based on the localization files.
-fn simple_text_update_system(
-    localization: Res<Localization<InteractiveLocalizationFolder>>,
-    mut query: Query<&mut Text, With<WelcomeText>>,
-) {
-    if let Ok(mut text) = query.get_single_mut() {
-        if let Ok(msg) = localization.try_get_message("hello") {
-            // Update the text with the localization
-            text.sections[0].value = msg;
-        }
-    }
 }
 
 fn parameterized_text_update_system(
@@ -154,7 +136,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ),
                     ..default()
                 })
-                .insert(WelcomeText);
+                .insert(LocalizedText::<InteractiveLocalizationFolder>::new("hello"));
 
             // Node for parameterized text
             parent
