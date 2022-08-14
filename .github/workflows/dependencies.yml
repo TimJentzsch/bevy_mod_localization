@@ -18,16 +18,12 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check:
+  cargo-deny:
     name: Dependency checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Install cargo-deny
-        run: cargo install cargo-deny
+      - uses: actions/checkout@v2
       - name: Check dependencies for duplicates, depedency issues and security advisories
-        run: cargo deny check all
+        uses: EmbarkStudios/cargo-deny-action@v1
+        with:
+          rust-version: stable
