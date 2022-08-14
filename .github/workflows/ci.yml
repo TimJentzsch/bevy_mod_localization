@@ -37,6 +37,9 @@ jobs:
         with:
           command: fmt
           args: --all --check
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-C debuginfo=0 -D warnings"
 
   clippy:
     name: Clippy
@@ -65,6 +68,9 @@ jobs:
         with:
           command: clippy
           args: --workspace --all-targets -- -D warnings
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-C debuginfo=0 -D warnings"
 
   test:
     name: Test
@@ -92,3 +98,6 @@ jobs:
         with:
           command: test
           args: --workspace
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-C debuginfo=0 -D warnings"
