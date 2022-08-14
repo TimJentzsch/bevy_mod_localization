@@ -3,6 +3,7 @@ use fluent::FluentResource;
 use unic_langid::LanguageIdentifier;
 
 use super::{
+    components::LocalizedText,
     utils::{get_ftl_path, get_resolution_chain},
     Localization, LocalizationFolder,
 };
@@ -101,6 +102,27 @@ pub fn update_localization_on_asset_change<T: LocalizationFolder>(
 
                 if let Some(lang_id) = lang_id {
                     localization.bundle_map.remove(&lang_id);
+                }
+            }
+        }
+    }
+}
+
+pub fn update_localized_text<T: LocalizationFolder>(
+    mut query: Query<(&mut Text, &LocalizedText<T>)>,
+    localization: Res<Localization<T>>,
+) {
+    if localization.is_changed() || localization.is_added() {
+        for (mut text, localized_text) in query.iter_mut() {
+            if let Ok(msg) = localization.try_get_message(localized_text.message_id()) {
+                // Update the text with the localization
+                if let Some(mut section) = text.sections.first_mut() {
+                    // The text already has a section; update it
+                    section.value = msg;
+                } else {
+                    // The text doesn't have sections yet; add a new one
+                    let section = TextSection::new(msg, TextStyle::default());
+                    text.sections.push(section);
                 }
             }
         }

@@ -1,4 +1,5 @@
 mod add_localization;
+mod components;
 mod folder;
 mod systems;
 mod utils;
