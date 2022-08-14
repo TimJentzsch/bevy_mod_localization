@@ -5,10 +5,12 @@ on:
     paths:
       - "**/Cargo.toml"
       - "deny.toml"
+      - ".github/workflows/dependencies.yml"
   push:
     paths:
       - "**/Cargo.toml"
       - "deny.toml"
+      - ".github/workflows/dependencies.yml"
     branches-ignore:
       - "dependabot/**"
 
