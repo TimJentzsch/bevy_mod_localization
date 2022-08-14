@@ -5,6 +5,7 @@ mod systems;
 mod utils;
 
 pub use add_localization::AddLocalization;
+pub use components::LocalizedText;
 pub use folder::LocalizationFolder;
 
 use std::marker::PhantomData;

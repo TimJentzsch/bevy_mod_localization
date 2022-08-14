@@ -5,7 +5,10 @@ use crate::{
 };
 
 use super::{
-    systems::{update_localization_on_asset_change, update_localization_on_locale_change},
+    systems::{
+        update_localization_on_asset_change, update_localization_on_locale_change,
+        update_localized_text,
+    },
     utils::{get_ftl_path, get_resolution_chain},
     Localization, LocalizationFolder,
 };
@@ -38,19 +41,22 @@ impl AddLocalization for App {
             localization.handle_map.insert(lang_id.clone(), handle);
         }
 
-        self.insert_resource(localization)
-            // First, check if the locale changed
-            .add_system_to_stage(
-                LocalizationStage::HandleChanges,
-                update_localization_on_locale_change::<T>,
-            )
-            // Then check if the asset changed
-            // A locale change will also reload the assets, so this has to happen afterwards
-            .add_system_to_stage(
-                LocalizationStage::HandleChanges,
-                update_localization_on_asset_change::<T>
-                    .after(update_localization_on_locale_change::<T>),
-            );
+        self.insert_resource(localization).add_system_set_to_stage(
+            LocalizationStage::HandleChanges,
+            SystemSet::new()
+                // First, check if the locale changed
+                .with_system(update_localization_on_locale_change::<T>)
+                // Then check if the asset changed
+                // A locale change will also reload the assets, so this has to happen afterwards
+                .with_system(
+                    update_localization_on_asset_change::<T>
+                        .after(update_localization_on_locale_change::<T>),
+                )
+                // Update localized text components
+                .with_system(
+                    update_localized_text::<T>.after(update_localization_on_asset_change::<T>),
+                ),
+        );
 
         self
     }
