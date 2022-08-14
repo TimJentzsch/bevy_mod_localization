@@ -11,8 +11,8 @@ on:
       - "**/Cargo.toml"
       - "deny.toml"
       - ".github/workflows/dependencies.yml"
-    branches-ignore:
-      - "dependabot/**"
+    branches:
+      - main
 
 env:
   CARGO_TERM_COLOR: always
