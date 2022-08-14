@@ -15,6 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-fmt-${{ hashFiles('**/Cargo.toml') }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -24,16 +33,29 @@ jobs:
       - name: Install alsa and udev
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
         if: runner.os == 'linux'
-      - uses: actions-rs/cargo@v1
+      - name: cargo fmt
+        uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all --check
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-C debuginfo=0 -D warnings"
 
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.toml') }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -43,16 +65,29 @@ jobs:
       - name: Install alsa and udev
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
         if: runner.os == 'linux'
-      - uses: actions-rs/cargo@v1
+      - name: cargo clippy
+        uses: actions-rs/cargo@v1
         with:
           command: clippy
           args: --workspace --all-targets -- -D warnings
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-C debuginfo=0 -D warnings"
 
   test:
     name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -61,7 +96,11 @@ jobs:
       - name: Install alsa and udev
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
         if: runner.os == 'linux'
-      - uses: actions-rs/cargo@v1
+      - name: cargo test
+        uses: actions-rs/cargo@v1
         with:
           command: test
           args: --workspace
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-C debuginfo=0 -D warnings"
