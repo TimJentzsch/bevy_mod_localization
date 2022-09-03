@@ -15,7 +15,7 @@ impl LocaleDefaultFallback {
     ///
     /// ```no_run
     /// # use bevy::prelude::*;
-    /// # use bevy_prototype_fluent::prelude::*;
+    /// # use bevy_mod_localization::prelude::*;
     /// #
     /// App::new()
     ///     .insert_resource(LocaleDefaultFallback::new(Some("en-US")))
@@ -30,7 +30,7 @@ impl LocaleDefaultFallback {
     ///
     /// ```no_run
     /// # use bevy::prelude::*;
-    /// # use bevy_prototype_fluent::prelude::*;
+    /// # use bevy_mod_localization::prelude::*;
     /// use unic_langid::langid;
     ///
     /// App::new()
@@ -47,7 +47,7 @@ impl LocaleDefaultFallback {
     ///
     /// ```
     /// # use bevy::prelude::*;
-    /// # use bevy_prototype_fluent::prelude::*;
+    /// # use bevy_mod_localization::prelude::*;
     /// #
     /// fn change_default_locale(mut default_locale: ResMut<LocaleDefaultFallback>) {
     ///     // Change the default fallback locale to French

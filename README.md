@@ -1,4 +1,4 @@
-# bevy_prototype_fluent
+# bevy_mod_localization
 
 A prototype to integrate [Project Fluent](https://projectfluent.org/) into the [Bevy game engine](https://bevyengine.org/)
 for localization support.

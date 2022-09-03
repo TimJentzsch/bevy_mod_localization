@@ -2,7 +2,7 @@ use bevy::{
     asset::{AssetPlugin, AssetServerSettings},
     prelude::*,
 };
-use bevy_prototype_fluent::prelude::*;
+use bevy_mod_localization::prelude::*;
 
 fn main() {
     App::new()

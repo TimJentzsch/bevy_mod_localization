@@ -19,7 +19,7 @@ use unic_langid::LanguageIdentifier;
 ///
 /// ```no_run
 /// # use bevy::prelude::*;
-/// # use bevy_prototype_fluent::prelude::*;
+/// # use bevy_mod_localization::prelude::*;
 /// #
 /// App::new()
 ///     .insert_resource(Locale::new("en-US"))
@@ -33,7 +33,7 @@ use unic_langid::LanguageIdentifier;
 ///
 /// ```no_run
 /// # use bevy::prelude::*;
-/// # use bevy_prototype_fluent::prelude::*;
+/// # use bevy_mod_localization::prelude::*;
 /// use unic_langid::langid;
 ///
 /// App::new()
@@ -49,7 +49,7 @@ use unic_langid::LanguageIdentifier;
 ///
 /// ```
 /// # use bevy::prelude::*;
-/// # use bevy_prototype_fluent::prelude::*;
+/// # use bevy_mod_localization::prelude::*;
 /// #
 /// fn change_locale(mut locale: ResMut<Locale>) {
 ///     // Change the locale to French
@@ -69,7 +69,7 @@ impl Locale {
     ///
     /// ```no_run
     /// # use bevy::prelude::*;
-    /// # use bevy_prototype_fluent::prelude::*;
+    /// # use bevy_mod_localization::prelude::*;
     /// #
     /// App::new()
     ///     .insert_resource(Locale::new("en-US"))
@@ -83,7 +83,7 @@ impl Locale {
     ///
     /// ```no_run
     /// # use bevy::prelude::*;
-    /// # use bevy_prototype_fluent::prelude::*;
+    /// # use bevy_mod_localization::prelude::*;
     /// use unic_langid::langid;
     ///
     /// App::new()
@@ -102,7 +102,7 @@ impl Locale {
     ///
     /// ```
     /// # use bevy::prelude::*;
-    /// # use bevy_prototype_fluent::prelude::*;
+    /// # use bevy_mod_localization::prelude::*;
     /// #
     /// fn change_locale(mut locale: ResMut<Locale>) {
     ///     // Change the locale to French

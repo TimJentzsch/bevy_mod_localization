@@ -4,4 +4,4 @@ pub use crate::{
     plugin::LocalizationPlugin,
 };
 
-pub use bevy_prototype_fluent_derive::*;
+pub use bevy_mod_localization_derive::*;

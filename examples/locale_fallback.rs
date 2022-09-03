@@ -24,7 +24,7 @@
 //!
 //! You can look at `/assets/strings/locale_fallback/` in this repository to see the definitions.
 use bevy::{asset::AssetServerSettings, prelude::*};
-use bevy_prototype_fluent::prelude::*;
+use bevy_mod_localization::prelude::*;
 
 #[derive(LocalizationFolder)]
 #[folder_path = "strings/locale_fallback"]
