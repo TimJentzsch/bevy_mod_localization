@@ -1,9 +1,16 @@
 # bevy_mod_localization
 
-A prototype to integrate [Project Fluent](https://projectfluent.org/) into the [Bevy game engine](https://bevyengine.org/)
-for localization support.
+Everything you need to localize your Bevy app.
 
-This prototype is very much in its early stages, expect incomplete features and horrible code quality.
+## Features
+
+Please note that this crate is still in development and that not all features are available yet.
+
+- [x] Locale management with fallbacks
+- [ ] Localization of arbitrary file-based assets (images, sounds, videos, etc.)
+- [x] Powerful text localization via [Project Fluent](https://projectfluent.org/)
+- [ ] Time-synchronized subtitles/captions via [WebVTT](https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API)
+- [x] Hot reloading
 
 ## License
 
