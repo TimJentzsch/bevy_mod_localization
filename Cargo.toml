@@ -1,5 +1,5 @@
 [package]
-name = "bevy_prototype_fluent"
+name = "bevy_mod_localization"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -7,21 +7,30 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy_prototype_fluent_derive = { path = "bevy_prototype_fluent_derive", version = "0.1.0" }
+bevy_mod_localization_derive = { path = "bevy_mod_localization_derive", version = "0.1.0" }
 anyhow = "1.0.58"
 fluent = "0.16.0"
 intl-memoizer = "0.5.1"
 unic-langid = { version = "0.9.0", features = ["macros"] }
 
 [dependencies.bevy]
-version = "0.8.0"
+version = "0.8.1"
 default-features = false
 features = ["bevy_asset", "bevy_text"]
 
 [dev-dependencies.bevy]
 version = "0.8.0"
 default-features = false
-features = ["bevy_asset", "bevy_text", "bevy_render", "bevy_core_pipeline", "render", "x11", "filesystem_watcher", "bevy_ui"]
+features = [
+  "bevy_asset",
+  "bevy_text",
+  "bevy_render",
+  "bevy_core_pipeline",
+  "render",
+  "x11",
+  "filesystem_watcher",
+  "bevy_ui",
+]
 
 [[example]]
 name = "basic"

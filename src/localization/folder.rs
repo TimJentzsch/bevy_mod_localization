@@ -5,7 +5,7 @@
 /// Instead of implementing it manually, it is recommended to use the derive macro:
 ///
 /// ```
-/// # use bevy_prototype_fluent::prelude::*;
+/// # use bevy_mod_localization::prelude::*;
 /// #
 /// #[derive(LocalizationFolder)]
 /// #[folder_path = "/strings/example"]
