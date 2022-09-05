@@ -5,7 +5,7 @@ use unic_langid::LanguageIdentifier;
 use super::{
     components::LocalizedText,
     utils::{get_ftl_path, get_resolution_chain},
-    Localization, LocalizationFolder,
+    Localization, LocalizationFolder, LocalizationVariables,
 };
 use crate::{
     fluent::FluentBundle,
@@ -108,22 +108,33 @@ pub fn update_localization_on_asset_change<T: LocalizationFolder>(
     }
 }
 
-pub fn update_localized_text<T: LocalizationFolder>(
-    mut query: Query<(&mut Text, &LocalizedText<T>)>,
-    localization: Res<Localization<T>>,
-) {
-    if localization.is_changed() || localization.is_added() {
-        for (mut text, localized_text) in query.iter_mut() {
-            if let Ok(msg) = localization.try_get_message(localized_text.message_id()) {
-                // Update the text with the localization
-                if let Some(mut section) = text.sections.first_mut() {
-                    // The text already has a section; update it
-                    section.value = msg;
-                } else {
-                    // The text doesn't have sections yet; add a new one
-                    let section = TextSection::new(msg, TextStyle::default());
-                    text.sections.push(section);
-                }
+pub fn update_localized_text<F, V>(
+    world: &World,
+    mut query: Query<(&mut Text, &LocalizedText<F, V>)>,
+    localization: Res<Localization<F>>,
+) where
+    F: LocalizationFolder,
+    V: LocalizationVariables,
+{
+    let has_localization_changed = localization.is_changed() || localization.is_added();
+
+    for (mut text, localized_text) in query.iter_mut() {
+        if !has_localization_changed && !localized_text.has_any_arg_changed(world) {
+            // No changes, no updates needed
+            return;
+        }
+
+        let args = localized_text.fluent_args(world);
+
+        if let Ok(msg) = localization.try_format_message(localized_text.message_id(), args) {
+            // Update the text with the localization
+            if let Some(mut section) = text.sections.first_mut() {
+                // The text already has a section; update it
+                section.value = msg;
+            } else {
+                // The text doesn't have sections yet; add a new one
+                let section = TextSection::new(msg, TextStyle::default());
+                text.sections.push(section);
             }
         }
     }

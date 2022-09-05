@@ -1,12 +1,15 @@
 mod add_localization;
 mod components;
 mod folder;
+mod localization_args;
 mod systems;
+mod traits;
 mod utils;
 
 pub use add_localization::AddLocalization;
 pub use components::LocalizedText;
 pub use folder::LocalizationFolder;
+pub use traits::{LocalizationArg, LocalizationVariables};
 
 use std::marker::PhantomData;
 

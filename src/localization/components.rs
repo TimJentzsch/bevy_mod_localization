@@ -1,47 +1,26 @@
 use std::marker::PhantomData;
 
 use bevy::prelude::*;
-use fluent::FluentValue;
+use fluent::FluentArgs;
 
-use super::LocalizationFolder;
-
-pub trait LocalizationArg: Send + Sync {
-    fn localization_value<'a>(&self, world: &World) -> FluentValue<'a>;
-}
-
-struct LocalizationVariable {
-    id: &'static str,
-    arg: Box<dyn LocalizationArg>,
-}
-
-impl LocalizationVariable {
-    pub fn new<A>(id: &'static str, arg: A) -> Self
-    where
-        // TODO: Do we need 'static here?
-        A: LocalizationArg + 'static,
-    {
-        Self {
-            id,
-            arg: Box::new(arg),
-        }
-    }
-}
+use super::{localization_args::LocalizationArgs, LocalizationFolder, LocalizationVariables};
 
 /// Automatically localize an entity with a [`Text`] component.
 ///
 /// The first section of the [`Text`] component will be updated with the specified message.
 /// This will be updated every time the locale or localization file changes.
 #[derive(Component)]
-pub struct LocalizedText<F>
+pub struct LocalizedText<F, V>
 where
     F: LocalizationFolder,
+    V: LocalizationVariables,
 {
     _localization_folder: PhantomData<F>,
     message_id: &'static str,
-    args: Vec<LocalizationVariable>,
+    variables: V,
 }
 
-impl<F> LocalizedText<F>
+impl<F> LocalizedText<F, LocalizationArgs>
 where
     F: LocalizationFolder,
 {
@@ -50,7 +29,22 @@ where
         Self {
             _localization_folder: PhantomData,
             message_id,
-            args: Vec::new(),
+            variables: LocalizationArgs::new(),
+        }
+    }
+}
+
+impl<F, V> LocalizedText<F, V>
+where
+    F: LocalizationFolder,
+    V: LocalizationVariables,
+{
+    /// Create a new localzed text with the given message ID and formatting variables.
+    pub fn new_with_variables(message_id: &'static str, variables: V) -> Self {
+        Self {
+            _localization_folder: PhantomData,
+            message_id,
+            variables,
         }
     }
 
@@ -59,12 +53,13 @@ where
         self.message_id
     }
 
-    pub fn add_arg<A>(&mut self, id: &'static str, arg: A) -> &mut LocalizedText<F>
-    where
-        // TODO: Do we need 'static here?
-        A: LocalizationArg + 'static,
-    {
-        self.args.push(LocalizationVariable::new(id, arg));
-        self
+    /// Has any argument value changed since last time?
+    pub fn has_any_arg_changed(&self, world: &World) -> bool {
+        self.variables.has_any_variable_changed(world)
+    }
+
+    /// Get the [`FluentArgs`] given the current world state.
+    pub fn fluent_args(&self, world: &World) -> FluentArgs {
+        self.variables.get_fluent_args(world)
     }
 }

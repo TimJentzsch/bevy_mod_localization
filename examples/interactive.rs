@@ -136,7 +136,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     ),
                     ..default()
                 })
-                .insert(LocalizedText::<InteractiveLocalizationFolder>::new("hello"));
+                .insert(LocalizedText::<InteractiveLocalizationFolder, _>::new(
+                    "hello",
+                ));
 
             // Node for parameterized text
             parent
