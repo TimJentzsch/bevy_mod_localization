@@ -2,6 +2,7 @@ mod default_fallback;
 mod fallback_map;
 mod into_language_identifier;
 
+use bevy::prelude::*;
 pub use default_fallback::LocaleDefaultFallback;
 pub use fallback_map::LocaleFallbackMap;
 pub use into_language_identifier::IntoLanguageIdentifier;
@@ -59,7 +60,7 @@ use unic_langid::LanguageIdentifier;
 ///
 /// Don't forget to add the system to your app.
 /// This method can be easily expanded to change the locale on a button press or other user input.
-#[derive(PartialEq, Eq, Debug, Clone)]
+#[derive(PartialEq, Eq, Debug, Clone, Resource)]
 pub struct Locale(pub(crate) LanguageIdentifier);
 
 impl Locale {

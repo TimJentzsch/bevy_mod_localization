@@ -1,3 +1,4 @@
+use bevy::prelude::*;
 use unic_langid::LanguageIdentifier;
 
 use super::into_language_identifier::IntoLanguageIdentifier;
@@ -5,7 +6,7 @@ use super::into_language_identifier::IntoLanguageIdentifier;
 /// The default locale to fall back to.
 ///
 /// Locale resolution: [`Locale`] -> [`LocaleFallbackMap`] -> [`LocaleDefaultFallback`].
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Resource)]
 pub struct LocaleDefaultFallback(pub(crate) Option<LanguageIdentifier>);
 
 impl LocaleDefaultFallback {

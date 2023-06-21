@@ -17,6 +17,7 @@ use unic_langid::LanguageIdentifier;
 
 use crate::LocalizationError;
 
+#[derive(Resource)]
 pub struct Localization<T: LocalizationFolder> {
     phantom: std::marker::PhantomData<T>,
     pub(crate) handle_map: HashMap<LanguageIdentifier, Handle<LocalizationSource>>,
@@ -69,7 +70,7 @@ impl<T: LocalizationFolder> Localization<T> {
             // The inserted values are wrapped in U+2058 (First Strong Isolate) and U+2069 (Pop Directional Isolate)
             // The font can't handle them, so we replace them for now
             // TODO: Don't do this
-            .map(|msg| msg.replace('\u{2068}', "").replace('\u{2069}', ""))
+            .map(|msg| msg.replace(['\u{2068}', '\u{2069}'], ""))
     }
 }
 
