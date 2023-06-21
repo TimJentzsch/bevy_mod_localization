@@ -23,7 +23,7 @@
 //! - Message 3: Defined for `de`.
 //!
 //! You can look at `/assets/strings/locale_fallback/` in this repository to see the definitions.
-use bevy::{asset::AssetServerSettings, prelude::*};
+use bevy::{asset::AssetPlugin, prelude::*};
 use bevy_mod_localization::prelude::*;
 
 #[derive(LocalizationFolder)]
@@ -35,12 +35,11 @@ fn main() {
     fallback_map.add_fallback("en-US", "en-GB");
 
     App::new()
-        // Optional: Enable hot reloading
-        .insert_resource(AssetServerSettings {
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            // Optional: Enable hot reloading
             watch_for_changes: true,
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         // First, try American English
         .insert_resource(Locale::new("en-US"))
         // The fallback for American English is British English
@@ -56,10 +55,10 @@ fn main() {
 
 /// Spawn the camera and text nodes.
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
 
     commands
-        .spawn_bundle(NodeBundle {
+        .spawn(NodeBundle {
             style: Style {
                 size: Size {
                     width: Val::Percent(100.0),
@@ -69,7 +68,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 align_items: AlignItems::Center,
                 ..default()
             },
-            color: UiColor(Color::NONE),
             ..default()
         })
         .with_children(|parent| {
@@ -85,7 +83,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 LocalizedText::<FallbackLocalizationFolder>::new("third"),
             ] {
                 parent
-                    .spawn_bundle(TextBundle {
+                    .spawn(TextBundle {
                         text: Text::from_section(
                             // This will later be replaced by the localized text
                             "",
