@@ -23,6 +23,7 @@ version = "0.10"
 default-features = false
 features = [
   "bevy_asset",
+  "bevy_sprite",
   "bevy_text",
   "bevy_render",
   "bevy_core_pipeline",
