@@ -1,4 +1,4 @@
-use bevy::{asset::AssetSet, prelude::*};
+use bevy::prelude::*;
 
 use crate::{
     loaders::ftl_loader::FtlLoader,
@@ -26,6 +26,8 @@ impl Plugin for LocalizationPlugin {
 
         app.init_asset_loader::<FtlLoader>();
 
-        app.configure_set(LocalizationSet::HandleChanges.after(AssetSet::AssetEvents));
+        // Handle the localization changes after the asset events are generated
+        // For some reason, `.after(AssetSet::AssetEvents)` doesn't work
+        app.configure_set(LocalizationSet::HandleChanges.in_base_set(CoreSet::Last));
     }
 }

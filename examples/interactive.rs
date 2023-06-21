@@ -39,9 +39,11 @@ fn main() {
         // Initialize the count to 0
         .insert_resource(AppleCount(0))
         .add_startup_system(setup)
-        .add_system(parameterized_text_update_system)
-        .add_system(locale_button_system)
-        .add_system(count_button_system)
+        .add_systems((
+            parameterized_text_update_system,
+            locale_button_system,
+            count_button_system,
+        ))
         .run();
 }
 
