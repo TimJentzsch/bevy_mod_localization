@@ -14,19 +14,18 @@ intl-memoizer = "0.5.1"
 unic-langid = { version = "0.9.0", features = ["macros"] }
 
 [dependencies.bevy]
-version = "0.8.1"
+version = "0.10"
 default-features = false
 features = ["bevy_asset", "bevy_text"]
 
 [dev-dependencies.bevy]
-version = "0.8.0"
+version = "0.10"
 default-features = false
 features = [
   "bevy_asset",
   "bevy_text",
   "bevy_render",
   "bevy_core_pipeline",
-  "render",
   "x11",
   "filesystem_watcher",
   "bevy_ui",
