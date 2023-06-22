@@ -1,3 +1,4 @@
+use bevy::prelude::*;
 use bevy::utils::HashMap;
 use unic_langid::LanguageIdentifier;
 
@@ -9,7 +10,7 @@ use super::into_language_identifier::IntoLanguageIdentifier;
 /// from `en-US` instead, if available.
 ///
 /// Locale resolution: [`Locale`] -> [`LocaleFallbackMap`] -> [`LocaleDefaultFallback`].
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Resource)]
 pub struct LocaleFallbackMap(pub(crate) HashMap<LanguageIdentifier, Vec<LanguageIdentifier>>);
 
 impl LocaleFallbackMap {

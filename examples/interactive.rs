@@ -1,6 +1,6 @@
 #![allow(clippy::type_complexity)]
 
-use bevy::{asset::AssetServerSettings, prelude::*};
+use bevy::prelude::*;
 use bevy_mod_localization::prelude::*;
 use fluent::FluentArgs;
 
@@ -13,6 +13,7 @@ struct InteractiveLocalizationFolder;
 struct AppleText;
 
 /// The count for the parameterized text.
+#[derive(Resource)]
 struct AppleCount(usize);
 
 #[derive(Component)]
@@ -26,12 +27,11 @@ struct LanguageButton(&'static str);
 
 fn main() {
     App::new()
-        // Optional: Enable hot reloading
-        .insert_resource(AssetServerSettings {
+        .add_plugins(DefaultPlugins.set(AssetPlugin {
+            // Optional: Enable hot reloading
             watch_for_changes: true,
             ..default()
-        })
-        .add_plugins(DefaultPlugins)
+        }))
         .insert_resource(Locale::new("en-US"))
         .add_plugin(LocalizationPlugin)
         // Add the localization resource for the given folder
@@ -39,9 +39,11 @@ fn main() {
         // Initialize the count to 0
         .insert_resource(AppleCount(0))
         .add_startup_system(setup)
-        .add_system(parameterized_text_update_system)
-        .add_system(locale_button_system)
-        .add_system(count_button_system)
+        .add_systems((
+            parameterized_text_update_system,
+            locale_button_system,
+            count_button_system,
+        ))
         .run();
 }
 
@@ -105,26 +107,25 @@ fn count_button_system(
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font = asset_server.load("fonts/FiraSans-Bold.ttf");
 
-    commands.spawn_bundle(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
 
     commands
-        .spawn_bundle(NodeBundle {
+        .spawn(NodeBundle {
             style: Style {
                 size: Size {
                     width: Val::Percent(100.0),
                     height: Val::Percent(100.0),
                 },
-                flex_direction: FlexDirection::ColumnReverse,
+                flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
                 ..default()
             },
-            color: UiColor(Color::NONE),
             ..default()
         })
         .with_children(|parent| {
             // Node for simple text
             parent
-                .spawn_bundle(TextBundle {
+                .spawn(TextBundle {
                     text: Text::from_section(
                         // This will later be replaced by the localized text
                         "",
@@ -140,7 +141,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
             // Node for parameterized text
             parent
-                .spawn_bundle(TextBundle {
+                .spawn(TextBundle {
                     text: Text::from_section(
                         // This will later be replaced by the localized text
                         "",
@@ -156,17 +157,16 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
             // Counter
             parent
-                .spawn_bundle(NodeBundle {
+                .spawn(NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Row,
                         align_items: AlignItems::Center,
                         ..default()
                     },
-                    color: UiColor(Color::NONE),
                     ..default()
                 })
                 .with_children(|parent| {
-                    parent.spawn_bundle(TextBundle {
+                    parent.spawn(TextBundle {
                         text: Text::from_section(
                             "Counter: ",
                             TextStyle {
@@ -179,36 +179,35 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     });
 
                     parent
-                        .spawn_bundle(get_locale_button_bundle())
+                        .spawn(get_locale_button_bundle())
                         .with_children(|parent| {
-                            parent.spawn_bundle(get_button_text_bundle("+", font.clone()));
+                            parent.spawn(get_button_text_bundle("+", font.clone()));
                         })
                         .insert(CountIncrementButton);
 
                     parent
-                        .spawn_bundle(get_locale_button_bundle())
+                        .spawn(get_locale_button_bundle())
                         .with_children(|parent| {
-                            parent.spawn_bundle(get_button_text_bundle("-", font.clone()));
+                            parent.spawn(get_button_text_bundle("-", font.clone()));
                         })
                         .insert(CountDecrementButton);
                 });
 
             // Buttons to change the language
             parent
-                .spawn_bundle(NodeBundle {
+                .spawn(NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Row,
                         ..default()
                     },
-                    color: UiColor(Color::NONE),
                     ..default()
                 })
                 .with_children(|parent| {
                     for locale in ["en-US", "de", "fr"] {
                         parent
-                            .spawn_bundle(get_locale_button_bundle())
+                            .spawn(get_locale_button_bundle())
                             .with_children(|parent| {
-                                parent.spawn_bundle(get_button_text_bundle(locale, font.clone()));
+                                parent.spawn(get_button_text_bundle(locale, font.clone()));
                             })
                             .insert(LanguageButton(locale));
                     }

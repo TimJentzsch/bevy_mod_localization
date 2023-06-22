@@ -1,20 +1,16 @@
-use bevy::{
-    asset::{AssetPlugin, AssetServerSettings},
-    prelude::*,
-};
+use bevy::{asset::AssetPlugin, prelude::*};
 use bevy_mod_localization::prelude::*;
 
 fn main() {
     App::new()
-        // Optional: Enable hot reloading
-        .insert_resource(AssetServerSettings {
-            watch_for_changes: true,
-            ..default()
-        })
         // Define the locale that you want to use by default
         .insert_resource(Locale::new("en-US"))
         .add_plugins(MinimalPlugins)
-        .add_plugin(AssetPlugin)
+        .add_plugin(AssetPlugin {
+            // Optional: Enable hot reloading
+            watch_for_changes: true,
+            ..default()
+        })
         .add_plugin(LocalizationPlugin)
         // Add the localization resource for the given folder
         .add_localization::<BasicLocalizationFolder>()

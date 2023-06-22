@@ -1,4 +1,4 @@
-use bevy::{asset::AssetStage, prelude::*};
+use bevy::prelude::*;
 
 use crate::{
     loaders::ftl_loader::FtlLoader,
@@ -6,9 +6,9 @@ use crate::{
     LocalizationOutput, LocalizationSource,
 };
 
-/// The names of localization stages in an App Schedule
-#[derive(Debug, Hash, PartialEq, Eq, Clone, StageLabel)]
-pub enum LocalizationStage {
+/// The sets containing the localization systems.
+#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
+pub enum LocalizationSet {
     HandleChanges,
 }
 
@@ -26,11 +26,8 @@ impl Plugin for LocalizationPlugin {
 
         app.init_asset_loader::<FtlLoader>();
 
-        // Stage to update localization after the file or locale has been loaded/changed
-        app.add_stage_after(
-            AssetStage::AssetEvents,
-            LocalizationStage::HandleChanges,
-            SystemStage::parallel(),
-        );
+        // Handle the localization changes after the asset events are generated
+        // For some reason, `.after(AssetSet::AssetEvents)` doesn't work
+        app.configure_set(LocalizationSet::HandleChanges.in_base_set(CoreSet::Last));
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    plugin::LocalizationStage,
+    plugin::LocalizationSet,
     prelude::{Locale, LocaleDefaultFallback, LocaleFallbackMap},
     LocalizationSource,
 };
@@ -41,21 +41,18 @@ impl AddLocalization for App {
             localization.handle_map.insert(lang_id.clone(), handle);
         }
 
-        self.insert_resource(localization).add_system_set_to_stage(
-            LocalizationStage::HandleChanges,
-            SystemSet::new()
+        self.insert_resource(localization).add_systems(
+            (
                 // First, check if the locale changed
-                .with_system(update_localization_on_locale_change::<T>)
+                update_localization_on_locale_change::<T>,
                 // Then check if the asset changed
                 // A locale change will also reload the assets, so this has to happen afterwards
-                .with_system(
-                    update_localization_on_asset_change::<T>
-                        .after(update_localization_on_locale_change::<T>),
-                )
+                update_localization_on_asset_change::<T>,
                 // Update localized text components
-                .with_system(
-                    update_localized_text::<T>.after(update_localization_on_asset_change::<T>),
-                ),
+                update_localized_text::<T>,
+            )
+                .chain()
+                .in_set(LocalizationSet::HandleChanges),
         );
 
         self
