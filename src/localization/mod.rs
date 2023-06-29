@@ -1,12 +1,12 @@
 mod add_localization;
-mod components;
-mod folder;
+mod asset;
+mod resolution_chain;
 mod systems;
+mod text;
 mod utils;
 
 pub use add_localization::AddLocalization;
-pub use components::LocalizedText;
-pub use folder::LocalizationFolder;
+pub use text::LocalizedText;
 
 use std::marker::PhantomData;
 
@@ -18,14 +18,13 @@ use unic_langid::LanguageIdentifier;
 use crate::LocalizationError;
 
 #[derive(Resource)]
-pub struct Localization<T: LocalizationFolder> {
-    phantom: std::marker::PhantomData<T>,
+pub struct Localization {
     pub(crate) handle_map: HashMap<LanguageIdentifier, Handle<LocalizationSource>>,
     pub(crate) bundle_map: HashMap<LanguageIdentifier, FluentBundle>,
     pub(crate) resolution_chain: Vec<LanguageIdentifier>,
 }
 
-impl<T: LocalizationFolder> Localization<T> {
+impl Localization {
     pub fn new(resolution_chain: Vec<LanguageIdentifier>) -> Self {
         Self {
             resolution_chain,

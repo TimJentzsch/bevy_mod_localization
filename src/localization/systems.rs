@@ -3,7 +3,7 @@ use fluent::FluentResource;
 use unic_langid::LanguageIdentifier;
 
 use super::{
-    components::LocalizedText,
+    text::LocalizedText,
     utils::{get_ftl_path, get_resolution_chain},
     Localization, LocalizationFolder,
 };
