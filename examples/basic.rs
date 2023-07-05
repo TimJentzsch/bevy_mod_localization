@@ -13,7 +13,7 @@ fn main() {
         })
         .add_plugin(LocalizationPlugin)
         // Add the localization resource for the given folder
-        .add_localization::<BasicLocalizationFolder>()
+        .register_localized_asset::<BasicLocalizationFolder>()
         // Do something with it!
         .add_system(print_message_system)
         .run();

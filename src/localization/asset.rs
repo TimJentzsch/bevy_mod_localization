@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use bevy::{asset::Asset, prelude::*, utils::HashMap};
 use unic_langid::LanguageIdentifier;
 
@@ -73,5 +75,17 @@ pub fn update_asset_on_locale_changes<A: Asset>(
             let handle = asset_server.load(localized_asset.get_asset_path(locale_id));
             localized_asset.handle_map.insert(locale_id, handle);
         }
+    }
+}
+
+/// A plugin to manage the localization of the asset of the given generic type.
+struct LocalizedAssetPlugin<A: Asset> {
+    /// Make the compiler happy by using the generic parameter.
+    _asset: PhantomData<A>,
+}
+
+impl<A: Asset> Plugin for LocalizedAssetPlugin<A> {
+    fn build(&self, app: &mut App) {
+        app.add_systems(update_asset_on_locale_changes::<A>);
     }
 }

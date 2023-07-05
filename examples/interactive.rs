@@ -35,7 +35,7 @@ fn main() {
         .insert_resource(Locale::new("en-US"))
         .add_plugin(LocalizationPlugin)
         // Add the localization resource for the given folder
-        .add_localization::<InteractiveLocalizationFolder>()
+        .register_localized_asset::<InteractiveLocalizationFolder>()
         // Initialize the count to 0
         .insert_resource(AppleCount(0))
         .add_startup_system(setup)

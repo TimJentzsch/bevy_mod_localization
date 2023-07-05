@@ -48,7 +48,7 @@ fn main() {
         .insert_resource(LocaleDefaultFallback::new(Some("de")))
         .add_plugin(LocalizationPlugin)
         // Add the localization resource for the given folder
-        .add_localization::<FallbackLocalizationFolder>()
+        .register_localized_asset::<FallbackLocalizationFolder>()
         .add_startup_system(setup)
         .run();
 }

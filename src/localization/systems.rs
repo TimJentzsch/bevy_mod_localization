@@ -5,7 +5,7 @@ use unic_langid::LanguageIdentifier;
 use super::{
     text::LocalizedText,
     utils::{get_ftl_path, get_resolution_chain},
-    Localization, LocalizationFolder,
+    Localization,
 };
 use crate::{
     fluent::FluentBundle,

@@ -1,11 +1,9 @@
-mod add_localization;
 mod asset;
 mod resolution_chain;
 mod systems;
 mod text;
 mod utils;
 
-pub use add_localization::AddLocalization;
 pub use text::LocalizedText;
 
 use std::marker::PhantomData;

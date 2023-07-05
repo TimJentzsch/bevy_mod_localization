@@ -1,6 +1,6 @@
 pub use crate::{
     locale::{Locale, LocaleDefaultFallback, LocaleFallbackMap},
-    localization::{AddLocalization, Localization, LocalizationFolder, LocalizedText},
+    localization::{Localization, LocalizationFolder, LocalizedText, RegisterLocalizedAsset},
     plugin::LocalizationPlugin,
 };
 
