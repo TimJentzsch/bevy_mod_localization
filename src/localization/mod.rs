@@ -6,8 +6,6 @@ mod utils;
 
 pub use text::LocalizedText;
 
-use std::marker::PhantomData;
-
 use crate::{fluent::FluentBundle, LocalizationSource};
 use bevy::{prelude::*, utils::HashMap};
 use fluent::FluentArgs;
@@ -68,16 +66,5 @@ impl Localization {
             // The font can't handle them, so we replace them for now
             // TODO: Don't do this
             .map(|msg| msg.replace(['\u{2068}', '\u{2069}'], ""))
-    }
-}
-
-impl<T: LocalizationFolder> Default for Localization<T> {
-    fn default() -> Self {
-        Self {
-            phantom: PhantomData,
-            resolution_chain: Vec::new(),
-            handle_map: HashMap::default(),
-            bundle_map: HashMap::default(),
-        }
     }
 }

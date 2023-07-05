@@ -19,6 +19,11 @@ pub struct LocalizedAsset<A: Asset> {
 
     /// A map from the locale IDs to the corresponding asset handles.
     handle_map: HashMap<LanguageIdentifier, Handle<A>>,
+
+    /// The currently used handle.
+    ///
+    /// This handle considers the current locale and which locales are available.
+    current_handle: Option<Handle<A>>,
 }
 
 impl<A: Asset> LocalizedAsset<A> {
@@ -31,17 +36,22 @@ impl<A: Asset> LocalizedAsset<A> {
             folder_path,
             extension,
             handle_map: HashMap::new(),
+            current_handle: None,
         }
     }
 
     /// Get the path to the asset of the given locale.
-    pub fn get_asset_path(&self, locale_id: LanguageIdentifier) -> String {
+    pub(crate) fn get_asset_path(&self, locale_id: LanguageIdentifier) -> String {
         format!(
             "{}/{}.{}",
             self.folder_path,
             locale_id.into(),
             self.extension
         )
+    }
+
+    pub fn current_handle(&self) -> Handle<A> {
+        self.current_handle
     }
 }
 
@@ -75,6 +85,14 @@ pub fn update_asset_on_locale_changes<A: Asset>(
             let handle = asset_server.load(localized_asset.get_asset_path(locale_id));
             localized_asset.handle_map.insert(locale_id, handle);
         }
+
+        // Update the current handle to the current locale
+        localized_asset.current_handle = Some(
+            localized_asset
+                .handle_map
+                .get(resolution_chain.chain.first().unwrap())
+                .unwrap(),
+        );
     }
 }
 
