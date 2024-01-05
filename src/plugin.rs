@@ -1,11 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    asset::loader::FtlLoader,
-    core::{
-        default_fallback::LocaleDefaultFallback, fallback_map::LocaleFallbackMap,
-        locale_chain::LocaleChain,
-    },
+    asset::plugin::LocalizationAssetPlugin, core::plugin::LocalizationCorePlugin,
     LocalizationOutput,
 };
 
@@ -20,13 +16,9 @@ pub struct LocalizationPlugin;
 
 impl Plugin for LocalizationPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<LocaleFallbackMap>();
-        app.init_resource::<LocaleDefaultFallback>();
-        app.init_resource::<LocaleChain>();
+        app.add_plugins((LocalizationCorePlugin, LocalizationAssetPlugin));
 
         // What does this do??
         app.init_non_send_resource::<LocalizationOutput>();
-
-        app.init_asset_loader::<FtlLoader>();
     }
 }
