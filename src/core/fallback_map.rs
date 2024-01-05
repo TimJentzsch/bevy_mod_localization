@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 use bevy::utils::HashMap;
-use unic_langid::LanguageIdentifier;
 
-use super::into_language_identifier::IntoLanguageIdentifier;
+use super::language_id::LanguageId;
 
 /// A map of locales to fall back to.
 ///
@@ -11,7 +10,7 @@ use super::into_language_identifier::IntoLanguageIdentifier;
 ///
 /// Locale resolution: [`Locale`] -> [`LocaleFallbackMap`] -> [`LocaleDefaultFallback`].
 #[derive(Debug, Default, Resource)]
-pub struct LocaleFallbackMap(pub(crate) HashMap<LanguageIdentifier, Vec<LanguageIdentifier>>);
+pub struct LocaleFallbackMap(pub(crate) HashMap<LanguageId, Vec<LanguageId>>);
 
 impl LocaleFallbackMap {
     pub fn new() -> Self {
@@ -21,16 +20,13 @@ impl LocaleFallbackMap {
     /// Insert the fallbacks for the given locale.
     ///
     /// The order of the fallbacks matters, they will be tried first to last.
-    pub fn insert<K, V>(&mut self, locale: K, fallbacks: Vec<V>) -> Option<Vec<LanguageIdentifier>>
+    pub fn insert<K, V>(&mut self, locale: K, fallbacks: Vec<V>) -> Option<Vec<LanguageId>>
     where
-        K: IntoLanguageIdentifier,
-        V: IntoLanguageIdentifier,
+        K: Into<LanguageId>,
+        V: Into<LanguageId>,
     {
-        let key = locale.into_language_identifier();
-        let value: Vec<LanguageIdentifier> = fallbacks
-            .into_iter()
-            .map(|x| x.into_language_identifier())
-            .collect();
+        let key = locale.into();
+        let value: Vec<LanguageId> = fallbacks.into_iter().map(|x| x.into()).collect();
 
         self.0.insert(key, value)
     }
@@ -41,11 +37,11 @@ impl LocaleFallbackMap {
     /// Otherwise, it will be added at the _end_ of the fallback list.
     pub fn add_fallback<K, V>(&mut self, locale: K, fallback: V)
     where
-        K: IntoLanguageIdentifier,
-        V: IntoLanguageIdentifier,
+        K: Into<LanguageId>,
+        V: Into<LanguageId>,
     {
-        let key = locale.into_language_identifier();
-        let value = fallback.into_language_identifier();
+        let key = locale.into();
+        let value = fallback.into();
 
         let cur_fallbacks = self.0.get_mut(&key);
 

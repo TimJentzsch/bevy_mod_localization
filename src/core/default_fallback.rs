@@ -1,13 +1,12 @@
 use bevy::prelude::*;
-use unic_langid::LanguageIdentifier;
 
-use super::into_language_identifier::IntoLanguageIdentifier;
+use super::language_id::LanguageId;
 
 /// The default locale to fall back to.
 ///
 /// Locale resolution: [`Locale`] -> [`LocaleFallbackMap`] -> [`LocaleDefaultFallback`].
 #[derive(Debug, Default, Resource)]
-pub struct LocaleDefaultFallback(pub(crate) Option<LanguageIdentifier>);
+pub struct LocaleDefaultFallback(pub(crate) Option<LanguageId>);
 
 impl LocaleDefaultFallback {
     /// Create a new [`LocaleDefaultFallback`].
@@ -40,8 +39,8 @@ impl LocaleDefaultFallback {
     ///     // -- snip --
     ///     .run();
     /// ```
-    pub fn new<T: IntoLanguageIdentifier>(locale: Option<T>) -> Self {
-        Self(locale.map(|into_locale| into_locale.into_language_identifier()))
+    pub fn new<T: Into<LanguageId>>(locale: Option<T>) -> Self {
+        Self(locale.map(|into_locale| into_locale.into()))
     }
 
     /// Change the default fallback locale.
@@ -58,7 +57,7 @@ impl LocaleDefaultFallback {
     ///     default_locale.set(Some("fr"));
     /// }
     /// ```
-    pub fn set<T: IntoLanguageIdentifier>(&mut self, locale: Option<T>) {
-        self.0 = locale.map(|into_locale| into_locale.into_language_identifier());
+    pub fn set<T: Into<LanguageId>>(&mut self, locale: Option<T>) {
+        self.0 = locale.map(|into_locale| into_locale.into());
     }
 }

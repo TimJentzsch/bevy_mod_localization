@@ -1,13 +1,10 @@
 use bevy::{prelude::*, reflect::TypeUuid};
 
-mod fluent;
-mod loaders;
-pub mod locale;
-pub mod localization;
+pub mod asset;
+pub mod core;
 pub mod plugin;
-pub mod prelude;
 
-#[derive(Debug, TypeUuid)]
+#[derive(Debug, TypeUuid, Asset, TypePath)]
 #[uuid = "c807fa98-31ad-4d85-8988-ab4313cced3f"]
 pub struct LocalizationSource {
     pub ftl_string: String,
