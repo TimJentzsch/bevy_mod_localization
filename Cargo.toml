@@ -8,6 +8,8 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 anyhow = "1.0.86"
+async-fs = "2.1.2"
+futures-lite = "2.3.0"
 unic-langid = { version = "0.9.5", features = ["macros"] }
 
 [dependencies.bevy]

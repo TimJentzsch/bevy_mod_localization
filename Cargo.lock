@@ -561,7 +561,9 @@ name = "bevy_mod_localization"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-fs",
  "bevy",
+ "futures-lite",
  "unic-langid",
 ]
 
