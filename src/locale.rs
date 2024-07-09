@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use bevy::prelude::Resource;
 use unic_langid::LanguageIdentifier;
@@ -17,6 +17,12 @@ impl LocaleId {
     }
 }
 
+impl Display for LocaleId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.language_id.fmt(f)
+    }
+}
+
 impl FromStr for LocaleId {
     type Err = <LanguageIdentifier as FromStr>::Err;
 
@@ -29,4 +35,10 @@ impl FromStr for LocaleId {
 #[derive(Debug, Clone, PartialEq, Eq, Resource)]
 pub struct Locale {
     pub locale_id: LocaleId,
+}
+
+impl Display for Locale {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.locale_id.fmt(f)
+    }
 }
