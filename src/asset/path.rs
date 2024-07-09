@@ -12,6 +12,7 @@ use crate::locale::LocaleId;
 /// If the `CARGO_MANIFEST_DIR` environment variable is set, then its value will be used
 /// instead. It's set by cargo when running with `cargo run`.
 pub fn get_base_path() -> PathBuf {
+    // HACK: Copied from bevy_asset
     if let Ok(manifest_dir) = env::var("BEVY_ASSET_ROOT") {
         PathBuf::from(manifest_dir)
     } else if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
@@ -21,6 +22,26 @@ pub fn get_base_path() -> PathBuf {
             .map(|path| path.parent().map(ToOwned::to_owned).unwrap())
             .unwrap()
     }
+}
+
+/// Normalizes the path by collapsing all occurrences of '.' and '..' dot-segments where possible
+/// as per [RFC 1808](https://datatracker.ietf.org/doc/html/rfc1808)
+pub fn normalize_path(path: &Path) -> PathBuf {
+    // HACK: Copied from bevy_asset
+    let mut result_path = PathBuf::new();
+    for elt in path.iter() {
+        if elt == "." {
+            // Skip
+        } else if elt == ".." {
+            if !result_path.pop() {
+                // Preserve ".." if insufficient matches (per RFC 1808).
+                result_path.push(elt);
+            }
+        } else {
+            result_path.push(elt);
+        }
+    }
+    result_path
 }
 
 /// Get the path of the directory which contains the localized assets.
