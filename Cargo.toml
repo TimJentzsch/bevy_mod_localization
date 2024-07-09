@@ -16,3 +16,6 @@ unic-langid = { version = "0.9.5", features = ["macros"] }
 path = "../bevy"
 default-features = false
 features = ["bevy_asset", "bevy_text"]
+
+[dev-dependencies.bevy]
+path = "../bevy"
