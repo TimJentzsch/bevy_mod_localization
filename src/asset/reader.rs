@@ -119,7 +119,7 @@ impl AssetReader for LocalizedReader {
 
 /// Get the path of the directory which contains the localized assets.
 ///
-/// `/flags.png` -> `/flags`
+/// `/flag.png` -> `/flag`
 fn get_localized_dir_path(path: &Path) -> PathBuf {
     let mut localized_dir_path = path.to_path_buf();
     localized_dir_path.set_extension(OsString::new());
@@ -128,7 +128,7 @@ fn get_localized_dir_path(path: &Path) -> PathBuf {
 
 /// Transform a path into its localized version for the given locale.
 ///
-/// `flags.png` -> `/flags/en-US.png`
+/// `flag.png` -> `/flag/en-US.png`
 fn get_localized_path(path: &Path, locale: &Locale) -> PathBuf {
     let extension = path.extension().unwrap_or_default().to_os_string();
     let mut localized_path = get_localized_dir_path(path);
@@ -141,7 +141,7 @@ fn get_localized_path(path: &Path, locale: &Locale) -> PathBuf {
 
 /// Get the path of the meta file of a localized asset.
 ///
-/// `/flags.png` -> `/flags/.meta`
+/// `/flag.png` -> `/flag/.meta`
 fn get_meta_path(path: &Path) -> PathBuf {
     let mut meta_path = get_localized_dir_path(path);
     meta_path.push(".meta");
