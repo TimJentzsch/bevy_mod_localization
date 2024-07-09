@@ -8,7 +8,7 @@ use async_fs::{read_dir, File};
 use bevy::asset::io::{AssetReader, AssetReaderError, PathStream, Reader};
 use futures_lite::StreamExt;
 
-use crate::locale::Locale;
+use crate::locale::LocaleId;
 
 /// An asset reader which will consider the currently active locale.
 ///
@@ -18,11 +18,11 @@ pub struct LocalizedReader {
     root_path: PathBuf,
 
     /// The locale which is currently active.
-    locale: Locale,
+    locale: LocaleId,
 }
 
 impl LocalizedReader {
-    pub fn new<P: AsRef<Path>>(path: P, locale: Locale) -> Self {
+    pub fn new<P: AsRef<Path>>(path: P, locale: LocaleId) -> Self {
         let root_path = Self::get_base_path().join(path.as_ref());
         Self { root_path, locale }
     }
@@ -129,7 +129,7 @@ fn get_localized_dir_path(path: &Path) -> PathBuf {
 /// Transform a path into its localized version for the given locale.
 ///
 /// `flag.png` -> `/flag/en-US.png`
-fn get_localized_path(path: &Path, locale: &Locale) -> PathBuf {
+fn get_localized_path(path: &Path, locale: &LocaleId) -> PathBuf {
     let extension = path.extension().unwrap_or_default().to_os_string();
     let mut localized_path = get_localized_dir_path(path);
 
