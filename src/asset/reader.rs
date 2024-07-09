@@ -1,4 +1,5 @@
 use std::{
+    env,
     ffi::OsString,
     path::{Path, PathBuf},
 };
@@ -18,6 +19,30 @@ pub struct LocalizedReader {
 
     /// The locale which is currently active.
     locale: Locale,
+}
+
+impl LocalizedReader {
+    pub fn new<P: AsRef<Path>>(path: P, locale: Locale) -> Self {
+        let root_path = Self::get_base_path().join(path.as_ref());
+        Self { root_path, locale }
+    }
+
+    /// Returns the base path of the assets directory, which is normally the executable's parent
+    /// directory.
+    ///
+    /// If the `CARGO_MANIFEST_DIR` environment variable is set, then its value will be used
+    /// instead. It's set by cargo when running with `cargo run`.
+    pub fn get_base_path() -> PathBuf {
+        if let Ok(manifest_dir) = env::var("BEVY_ASSET_ROOT") {
+            PathBuf::from(manifest_dir)
+        } else if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
+            PathBuf::from(manifest_dir)
+        } else {
+            env::current_exe()
+                .map(|path| path.parent().map(ToOwned::to_owned).unwrap())
+                .unwrap()
+        }
+    }
 }
 
 // HACK: Implementation mostly copy & pasted from Bevy's `FileAssetReader`.
