@@ -1,4 +1,5 @@
 use bevy::asset::io::{AssetSourceEvent, AssetWatcher};
+use bevy::log::warn;
 use bevy::utils::tracing::error;
 use bevy::utils::Duration;
 use crossbeam_channel::Sender;
@@ -282,4 +283,28 @@ pub(crate) trait FilesystemEventHandler: Send + Sync + 'static {
     fn get_path(&self, absolute_path: &Path) -> Option<(PathBuf, bool)>;
     /// Handle the given event
     fn handle(&mut self, absolute_paths: &[PathBuf], event: AssetSourceEvent);
+}
+
+/// Get a function which will construct the appropriate localized file watcher.
+///
+/// The returned function can be used with `AssetSource::with_watcher`.
+pub fn get_localized_watcher(
+    root_path: String,
+    file_debounce_wait_time: Duration,
+) -> impl FnMut(crossbeam_channel::Sender<AssetSourceEvent>) -> Option<Box<dyn AssetWatcher>> + Send + Sync
+{
+    move |sender: crossbeam_channel::Sender<AssetSourceEvent>| {
+        let path = std::path::PathBuf::from(root_path.clone());
+        if path.exists() {
+            Some(Box::new(
+                LocalizedFileWatcher::new(path.clone(), sender, file_debounce_wait_time)
+                    .unwrap_or_else(|e| {
+                        panic!("Failed to create file watcher from path {path:?}, {e:?}")
+                    }),
+            ))
+        } else {
+            warn!("Skip creating file watcher because path {path:?} does not exist.");
+            None
+        }
+    }
 }
